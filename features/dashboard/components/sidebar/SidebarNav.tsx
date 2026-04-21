@@ -12,7 +12,7 @@ import {
 
 const navItems = [
     {label: 'Dashboard', href: '/dashboard', icon: FiGrid},
-    {label: 'Analytic', href: '/dashboard/analytic', icon: FiBarChart2},
+    {label: 'Analytic', href: '/dashboard/analytics', icon: FiBarChart2},
     {label: 'Schedule', href: '/dashboard/schedule', icon: FiCalendar},
     {label: 'Library', href: '/dashboard/library', icon: FiFolder},
     {label: 'Inbox', href: '/dashboard/inbox', icon: FiInbox},
