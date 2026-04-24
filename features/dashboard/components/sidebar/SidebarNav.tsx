@@ -2,20 +2,20 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { HiThumbUp } from "react-icons/hi"
 import {
     FiGrid,
     FiBarChart2,
     FiCalendar,
-    FiFolder,
-    FiInbox,
+    FiCompass,
 } from 'react-icons/fi'
 
 const navItems = [
     {label: 'Dashboard', href: '/dashboard', icon: FiGrid},
     {label: 'Analytic', href: '/dashboard/analytics', icon: FiBarChart2},
     {label: 'Schedule', href: '/dashboard/schedule', icon: FiCalendar},
-    {label: 'Library', href: '/dashboard/library', icon: FiFolder},
-    {label: 'Inbox', href: '/dashboard/inbox', icon: FiInbox},
+    {label: 'Insight', href: '/dashboard/insight', icon: FiCompass},
+    {label: 'Recommendation', href: '/dashboard/recommendation', icon: HiThumbUp},
 
 ];
 

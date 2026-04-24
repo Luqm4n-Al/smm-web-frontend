@@ -1,6 +1,6 @@
 import { StatGrid } from '@/features/dashboard/components/stats/StatGrid';
 import { GrowthLineChart } from '@/features/dashboard/components/charts/GrowthLineChart';
-import { dummyStats, dummyGrowthData } from '@/lib/dummyData';
+import { dummyStats, dummyGrowthData } from '@/lib/dummyDataStats';
 
 export default function DashboardPage() {
   return (
