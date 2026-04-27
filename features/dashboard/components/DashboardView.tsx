@@ -9,17 +9,24 @@ import { GrowthLineChart } from './charts/GrowthLineChart';
 
 export function DashboardView() {
   const [platform, setPlatform] = useState<'all' | 'instagram' | 'tiktok'>('all');
+
+  // Query awal
   const { stats, loading: statsLoading, error: statsError } = usePlatformData(platform);
-  const { data, loading: analyticsLoading, error: analyticsError } = useGetAnalyticsQuery();
+  const { data: queryData, loading: analyticsLoading, error: analyticsError } = useGetAnalyticsQuery();
+
+  // Gabungkan: jika liveData ada, gunakan; jika tidak, gunakan data query
+  const effectiveAnalytics = queryData?.analytics;
+  const growth = effectiveAnalytics?.growthMatrix;
+  const followerGrowth = growth?.followers?.map(item => ({
+    date: item.date,
+    followers: item.quantity,
+  })) || [];
 
   const loading = statsLoading || analyticsLoading;
   const error = statsError || analyticsError;
 
   if (loading) return <div className="flex justify-center py-20 text-gray-500">Memuat dashboard...</div>;
   if (error) return <div className="flex justify-center py-20 text-red-500">Error: {error.message}</div>;
-
-  const growth = data?.analytics?.growthMatrix;
-  const followerGrowth = growth?.followers?.map(item => ({ date: item.date, followers: item.quantity })) || [];
 
   return (
     <div className="space-y-6">
