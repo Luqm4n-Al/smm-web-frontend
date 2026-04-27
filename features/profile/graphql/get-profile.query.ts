@@ -4,7 +4,7 @@ import type { UserProfile } from './profile.types';
 
 export const GET_PROFILE_QUERY = gql`
   query GetProfile {
-    me {
+    UserInfo {
       username
       email
       avatar
@@ -19,5 +19,5 @@ export const GET_PROFILE_QUERY = gql`
 `;
 
 export const useGetProfileQuery = () => {
-  return useQuery<{ me: UserProfile }>(GET_PROFILE_QUERY);
+  return useQuery<{ UserInfo: UserProfile }>(GET_PROFILE_QUERY);
 };

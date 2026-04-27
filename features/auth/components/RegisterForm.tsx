@@ -50,11 +50,6 @@ export function RegisterForm() {
     }
   };
 
-    const handleBack = async () => {
-        await signOut({ redirect: false });
-        router.push('/login');
-    }
-
   // ... kode JSX tidak berubah, hanya tambahkan disabled pada button saat loading
   return (
     <div className="w-full max-w-md">

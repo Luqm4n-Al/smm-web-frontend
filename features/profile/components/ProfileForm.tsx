@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { flushSync } from 'react-dom';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
@@ -30,29 +29,28 @@ export function ProfileForm() {
   const initializedRef = useRef(false);
 
   // Isi form saat data profil tersedia  
-  // This pattern is acceptable: initializing form state once from loaded data
+  // Pattern: Initialize form state once from loaded data using ref guard
+  // This prevents cascading renders since initializedRef.current ensures single execution
   useEffect(() => {
-    if (!data?.me || initializedRef.current) return;
+    if (!data?.UserInfo || initializedRef.current) return;
     
     initializedRef.current = true;
     
-    // Batch state updates to prevent cascading renders
-    flushSync(() => {
-      setPhone(data.me.phone);
-      setAvatarPreview(data.me.avatar || null);
-      
-      const insta = (data.me.social_account as SocialAccount[]).find((s) => s.platform === 'instagram');
-      const tiktokAcc = (data.me.social_account as SocialAccount[]).find((s) => s.platform === 'tiktok');
-      
-      if (insta) {
-        setInstagram(insta.username || '');
-        setApiKey(insta.api_key || '');
-      }
-      
-      if (tiktokAcc) {
-        setTiktok(tiktokAcc.username || '');
-      }
-    });
+    // Set all form state from profile data
+    setPhone(data.UserInfo.phone);
+    setAvatarPreview(data.UserInfo.avatar || null);
+    
+    const insta = (data.UserInfo.social_account as SocialAccount[]).find((s) => s.platform === 'instagram');
+    const tiktokAcc = (data.UserInfo.social_account as SocialAccount[]).find((s) => s.platform === 'tiktok');
+    
+    if (insta) {
+      setInstagram(insta.username || '');
+      setApiKey(insta.api_key || '');
+    }
+    
+    if (tiktokAcc) {
+      setTiktok(tiktokAcc.username || '');
+    }
   }, [data]);
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,7 +84,7 @@ export function ProfileForm() {
 
     try {
       // Ubah phone jika berbeda
-      if (phone !== data?.me?.phone) {
+      if (phone !== data?.UserInfo?.phone) {
         await changePhone({ variables: { input: phone } });
         toast.success('Nomor telepon diperbarui');
       }
@@ -99,8 +97,12 @@ export function ProfileForm() {
       if (tiktok) {
         socialInput.push({ platform: 'tiktok', username: tiktok });
       }
-      await changeSocial({ variables: { input: socialInput } });
-      toast.success('Akun media sosial diperbarui');
+      
+      // Hanya kirim mutation jika ada social account yang diupdate
+      if (socialInput.length > 0) {
+        await changeSocial({ variables: { input: socialInput } });
+        toast.success('Akun media sosial diperbarui');
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Gagal menyimpan perubahan';
       toast.error(errorMessage);
@@ -132,7 +134,7 @@ export function ProfileForm() {
             ) : (
               <div className="h-20 w-20 rounded-full bg-linear-to-br from-blue-100 to-blue-200 flex items-center justify-center ring-2 ring-blue-100">
                 <span className="text-2xl font-bold text-blue-600">
-                  {data?.me?.username?.charAt(0).toUpperCase()}
+                  {data?.UserInfo?.username?.charAt(0).toUpperCase()}
                 </span>
               </div>
             )}
@@ -155,14 +157,14 @@ export function ProfileForm() {
               <label className={labelClass}>Username</label>
               <div className="relative mt-1">
                 <span className={iconClass}><FiUser className="h-4 w-4" /></span>
-                <input type="text" value={data?.me?.username || ''} disabled className={`${inputClass} pl-10`} />
+                <input type="text" value={data?.UserInfo?.username || ''} disabled className={`${inputClass} pl-10`} />
               </div>
             </div>
             <div>
               <label className={labelClass}>Email</label>
               <div className="relative mt-1">
                 <span className={iconClass}><FiMail className="h-4 w-4" /></span>
-                <input type="email" value={data?.me?.email || ''} disabled className={`${inputClass} pl-10`} />
+                <input type="email" value={data?.UserInfo?.email || ''} disabled className={`${inputClass} pl-10`} />
               </div>
               <p className="mt-1 text-xs text-gray-500">Email tidak dapat diubah</p>
             </div>
@@ -207,13 +209,39 @@ export function ProfileForm() {
         {/* Tombol Aksi */}
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
           <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={() => toast.success('Laporan sedang disiapkan...')} className="..."><FiDownload /> Download Account Report</button>
-            <button type="button" onClick={() => router.push('/change-password')} className="..."><FiLock /> Change Password</button>
+            <button 
+              type="button" 
+              onClick={() => toast.success('Laporan sedang disiapkan...')} 
+              className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+            >
+              <FiDownload className="h-4 w-4" /> 
+              Download Account Report
+            </button>
+            <button 
+              type="button" 
+              onClick={() => router.push('/change-password')} 
+              className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+            >
+              <FiLock className="h-4 w-4" /> 
+              Change Password
+            </button>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={() => router.push('/dashboard')} className="..."><FiArrowLeft /> Kembali ke Dashboard</button>
-            <button type="submit" disabled={phoneLoading || socialLoading} className="... bg-blue-600 text-white ...">
-              <FiSave /> {phoneLoading || socialLoading ? 'Menyimpan...' : 'Simpan perubahan'}
+            <button 
+              type="button" 
+              onClick={() => router.push('/dashboard')} 
+              className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+            >
+              <FiArrowLeft className="h-4 w-4" /> 
+              Kembali ke Dashboard
+            </button>
+            <button 
+              type="submit" 
+              disabled={phoneLoading || socialLoading} 
+              className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <FiSave className="h-4 w-4" /> 
+              {phoneLoading || socialLoading ? 'Menyimpan...' : 'Simpan perubahan'}
             </button>
           </div>
         </div>

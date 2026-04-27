@@ -6,12 +6,30 @@ const httpLink = createHttpLink({
   credentials: 'include',
 });
 
+/**
+ * Auth link untuk attach Authorization header ke setiap GraphQL request
+ * Read token dari localStorage setiap kali ada request (bukan cached)
+ */
 const authLink = setContext((_, { headers }) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  // Read token dari localStorage pada waktu request (bukan di load time)
+  let token: string | null = null;
+  
+  if (typeof window !== 'undefined') {
+    token = localStorage.getItem('token');
+    
+    // Debug logging
+    if (token) {
+      console.log('🔐 [Apollo authLink] Token found in localStorage');
+    } else {
+      console.warn('⚠️ [Apollo authLink] No token in localStorage');
+    }
+  }
+
   return {
     headers: {
       ...headers,
-      authorization: token ? `Bearer ${token}` : '',
+      // Set authorization header jika token ada
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
     },
   };
 });

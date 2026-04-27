@@ -1,7 +1,7 @@
 export interface SocialAccount {
   platform: string;
   username: string;
-  api_key?: string | null;
+  api_key: string | null;
 }
 
 export interface UserProfile {
