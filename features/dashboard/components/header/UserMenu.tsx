@@ -25,7 +25,7 @@ export function UserMenu() {
       {isOpen && (
         <div className="absolute right-0 mt-2 w-48 rounded-md border bg-white py-1 shadow-lg">
           <Link
-            href="/dashboard/profil"
+            href="/dashboard/profile"
             className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             <FiUser className="h-4 w-4" />

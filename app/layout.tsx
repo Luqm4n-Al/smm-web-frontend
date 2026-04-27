@@ -1,4 +1,5 @@
 import '@/app/globals.css';
+import { Providers } from '@/lib/providers';
 import type { Metadata } from 'next';
 import { Toaster } from 'react-hot-toast';
 
@@ -15,7 +16,7 @@ export default function RootLayout({
   return (
     <html>
       <body>
-        {children}
+        <Providers>{children}</Providers>
         <Toaster 
           position='top-right'
           toastOptions={{ 
