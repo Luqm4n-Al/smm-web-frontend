@@ -15,7 +15,7 @@ export function AnalyticsView() {
 
   const { stats, loading: statsLoading, error: statsError } = usePlatformData(platform);
   const { data: queryData, loading, error } = useGetAnalyticsQuery();
-  const { liveData } = useAnalyticsSubscription(); // 🆕
+  const { liveData } = useAnalyticsSubscription(); // Data real-time webscoket
 
   // Gabungkan data
   const effectiveAnalytics = liveData || queryData?.analytics;

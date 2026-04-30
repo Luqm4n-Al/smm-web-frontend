@@ -6,7 +6,7 @@ import { useVerifyOtpMutation } from '../graphql/verify-otp.mutation';
 import { useResendOtpMutation } from '../graphql/resend-otp.mutation'; //import
 import toast from 'react-hot-toast';
 import { FiArrowLeft } from 'react-icons/fi';
-import { apolloClient } from '@/lib/graphql/client';
+import { apolloClient } from '@/lib/graphql/apollo-client';
 
 interface OtpVerificationFormProps {
   email: string;

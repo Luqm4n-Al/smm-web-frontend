@@ -25,6 +25,7 @@ interface Event {
 
 interface CustomCalendarProps {
   events: Event[];
+  selectedDate?: Date 
   onSelectDate?: (date: Date) => void;
 }
 

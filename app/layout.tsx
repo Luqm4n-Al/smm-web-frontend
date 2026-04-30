@@ -1,5 +1,6 @@
 import '@/app/globals.css';
 import { Providers } from '@/lib/providers';
+import { ClientLayoutWrapper } from './ClientLayoutWrapper';
 import type { Metadata } from 'next';
 import { Toaster } from 'react-hot-toast';
 
@@ -16,7 +17,9 @@ export default function RootLayout({
   return (
     <html>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          <ClientLayoutWrapper>{children}</ClientLayoutWrapper>
+        </Providers>
         <Toaster 
           position='top-right'
           toastOptions={{ 

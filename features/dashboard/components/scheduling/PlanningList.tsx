@@ -1,18 +1,23 @@
-// src/features/dashboard/components/Scheduling/PlanningList.tsx
 'use client';
 
 import { useState } from 'react';
-import { PlanningItem } from './PlanningItem';
-import { CreatePlanModal } from './CreatePlanModal';
 import { FiPlus } from 'react-icons/fi';
+import { CreatePlanModal } from './CreatePlanModal';
+import type { ContentSchedule } from '../../graphql/schedule.types';
+import type { ApolloQueryResult } from '@apollo/client';
 
-const plans = [
-  { id: '1', name: 'Postingan Tips Karir', date: '12 Jan 2024', status: 'scheduled' as const },
-  { id: '2', name: 'Giveaway Akhir Bulan', date: '25 Jan 2024', status: 'draft' as const },
-  { id: '3', name: 'Behind the Scene', date: '8 Jan 2024', status: 'published' as const },
-];
+const statusMap: Record<string, { label: string; className: string }> = {
+  DRAFT: { label: 'Draft', className: 'bg-gray-100 text-gray-700' },
+  SCHEDULED: { label: 'Terjadwal', className: 'bg-yellow-100 text-yellow-700' },
+  POSTED: { label: 'Dipublikasi', className: 'bg-green-100 text-green-700' },
+};
 
-export function PlanningList() {
+interface PlanningListProps {
+  schedules: ContentSchedule[];
+  onRefresh: () => Promise<ApolloQueryResult<any>>;
+}
+
+export function PlanningList({ schedules, onRefresh }: PlanningListProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -28,14 +33,30 @@ export function PlanningList() {
             Tambah Plan
           </button>
         </div>
-        <div className="space-y-2">
-          {plans.map((plan) => (
-            <PlanningItem key={plan.id} name={plan.name} date={plan.date} status={plan.status} />
-          ))}
+        <div className="space-y-2 max-h-125 overflow-y-auto">
+          {schedules.length === 0 ? (
+            <p className="text-center text-sm text-gray-500 py-4">Belum ada rencana.</p>
+          ) : (
+            schedules.map(s => (
+              <div key={s.id} className="flex items-center justify-between rounded-lg border p-3">
+                <div>
+                  <p className="font-medium text-sm">{s.title}</p>
+                  <p className="text-xs text-gray-500">{s.scheduleUpload ? new Date(s.scheduleUpload).toLocaleDateString('id-ID') : '-'}</p>
+                </div>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusMap[s.status]?.className || 'bg-gray-100'}`}>
+                  {statusMap[s.status]?.label || s.status}
+                </span>
+              </div>
+            ))
+          )}
         </div>
       </div>
 
-      <CreatePlanModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <CreatePlanModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSuccess={() => { setIsModalOpen(false); onRefresh(); }}
+      />
     </>
   );
 }

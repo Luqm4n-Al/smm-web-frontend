@@ -1,81 +1,66 @@
-// src/features/insight/components/BlacklistPanel.tsx
 'use client';
 
 import { useState } from 'react';
 import { FiPlus, FiX } from 'react-icons/fi';
+import { useAddBlacklistMutation } from '../../graphql/add-blacklist.mutation';
+import { useRemoveBlacklistMutation } from '../../graphql/remove-blacklist.mutation';
+import type { CommentBlackList } from '../../graphql/insight.types';
+import toast from 'react-hot-toast';
 
-export function BlacklistPanel() {
-  const [keywords, setKeywords] = useState<string[]>([
-    'jelek',
-    'scam',
-    'penipuan',
-    'sampah',
-    'bego',
-  ]);
-  const [newKeyword, setNewKeyword] = useState('');
+interface BlacklistPanelProps {
+  blacklists: CommentBlackList[];
+}
 
-  const addKeyword = () => {
-    if (newKeyword.trim() && !keywords.includes(newKeyword.trim())) {
-      setKeywords([...keywords, newKeyword.trim()]);
-      setNewKeyword('');
+export function BlacklistPanel({ blacklists }: BlacklistPanelProps) {
+  const [newWord, setNewWord] = useState('');
+  const [addBlacklist] = useAddBlacklistMutation();
+  const [removeBlacklist] = useRemoveBlacklistMutation();
+
+  const handleAdd = async () => {
+    if (!newWord.trim()) return;
+    try {
+      await addBlacklist({ variables: { input: { word: newWord.trim() } } });
+      toast.success('Kata ditambahkan');
+      setNewWord('');
+    } catch (err: any) {
+      toast.error(err.message || 'Gagal menambah');
     }
   };
 
-  const removeKeyword = (keyword: string) => {
-    setKeywords(keywords.filter((k) => k !== keyword));
+  const handleRemove = async (id: string) => {
+    try {
+      await removeBlacklist({ variables: { id } });
+      toast.success('Kata dihapus');
+    } catch (err: any) {
+      toast.error(err.message || 'Gagal menghapus');
+    }
   };
 
   return (
     <div className="rounded-lg border bg-white p-4 shadow-sm">
-      <h3 className="mb-4 text-lg font-medium text-gray-900">Blacklist Keyword</h3>
-      <p className="mb-4 text-sm text-gray-600">
-        Komentar yang mengandung kata-kata ini akan otomatis disembunyikan dari analisis.
-      </p>
-
-      {/* Input */}
-      <div className="mb-4 flex gap-2">
+      <h3 className="mb-2 text-lg font-medium">Blacklist Keyword</h3>
+      <div className="flex gap-2 mb-3">
         <input
-          type="text"
-          value={newKeyword}
-          onChange={(e) => setNewKeyword(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && addKeyword()}
-          placeholder="Tambah kata..."
-          className="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none"
+          value={newWord}
+          onChange={e => setNewWord(e.target.value)}
+          onKeyDown={e => e.key === 'Enter' && handleAdd()}
+          placeholder="Kata..."
+          className="flex-1 rounded-md border px-3 py-1.5 text-sm"
         />
-        <button
-          onClick={addKeyword}
-          className="flex items-center gap-1 rounded-md bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-700"
-        >
-          <FiPlus className="h-4 w-4" />
-          Tambah
+        <button onClick={handleAdd} className="rounded-md bg-blue-600 px-3 py-1.5 text-white text-sm">
+          <FiPlus />
         </button>
       </div>
-
-      {/* List Keyword */}
-      <div className="max-h-80 overflow-y-auto">
-        <ul className="space-y-2">
-          {keywords.map((keyword) => (
-            <li
-              key={keyword}
-              className="flex items-center justify-between rounded-md bg-gray-50 px-3 py-2"
-            >
-              <span className="text-sm font-medium text-gray-900">{keyword}</span>
-              <button
-                onClick={() => removeKeyword(keyword)}
-                className="text-gray-400 hover:text-red-600"
-              >
-                <FiX className="h-4 w-4" />
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="mt-4 border-t pt-4">
-        <p className="text-xs text-gray-500">
-          {keywords.length} kata dalam daftar hitam
-        </p>
-      </div>
+      <ul className="space-y-1 max-h-60 overflow-y-auto">
+        {blacklists.map(item => (
+          <li key={item.id} className="flex items-center justify-between text-sm py-1">
+            <span>{item.word}</span>
+            <button onClick={() => handleRemove(item.id)} className="text-red-500 hover:text-red-700">
+              <FiX />
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

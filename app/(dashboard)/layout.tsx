@@ -1,6 +1,4 @@
 // src/app/(dashboard)/layout.tsx
-// import { redirect } from 'next/navigation';
-// import { getServerSession } from 'next-auth';
 import { Sidebar } from '@/features/dashboard/components/sidebar';
 import { Header } from '@/features/dashboard/components/header';
 
@@ -9,7 +7,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // 🚧 Nonaktifkan auth sementara untuk development
+  // Nonaktifkan auth sementara untuk development
   // const session = await getServerSession();
   // if (!session) {
   //   redirect('/login');
