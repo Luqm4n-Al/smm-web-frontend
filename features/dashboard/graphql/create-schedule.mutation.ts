@@ -8,7 +8,7 @@ export const CREATE_SCHEDULE = gql `
             id
             title
             status
-            scheduleUpload
+            scheduledUpload
             createdAt
         }
     }

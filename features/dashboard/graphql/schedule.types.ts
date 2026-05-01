@@ -6,7 +6,7 @@ export interface ContentSchedule {
     caption?: string | null;
     fileUrl?: string | null;
     status: ScheduleStatus;
-    scheduleUpload?: string | null;
+    scheduledUpload?: string | null;
     createdAt: string;
 }
 
@@ -14,5 +14,5 @@ export interface CreateContentScheduleInput {
     title:string;
     caption?: string;
     fileUrl?: string;
-    scheduleUpload?: string; 
+    scheduledUpload?: string; 
 }

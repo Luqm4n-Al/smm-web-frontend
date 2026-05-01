@@ -16,7 +16,7 @@ export function SidebarFooter() {
                 ${
                     isActive
                     ? 'bg-blue-50 text-blue-700'
-                    : 'text-gray-700 hover:bg-gray-700'
+                    : 'text-gray-700 hover:bg-gray-500'
                 }`}
             >
                 <FiSettings className="h-5 w-5"/>

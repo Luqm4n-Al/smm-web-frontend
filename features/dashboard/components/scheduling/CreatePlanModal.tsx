@@ -26,7 +26,7 @@ export function CreatePlanModal({ isOpen, onClose, onSuccess }: Props) {
         variables: {
           input: {
             title,
-            scheduleUpload: scheduledUpload ? new Date(scheduledUpload).toISOString() : undefined,
+            scheduledUpload: scheduledUpload ? new Date(scheduledUpload).toISOString() : undefined,
           },
         },
       });

@@ -13,11 +13,11 @@ const statusMap: Record<string, { label: string; className: string }> = {
 };
 
 interface PlanningListProps {
-  schedules: ContentSchedule[];
-  onRefresh: () => Promise<ApolloQueryResult<any>>;
+  schedules?: ContentSchedule[];
+  onRefresh: () => Promise<any>;
 }
 
-export function PlanningList({ schedules, onRefresh }: PlanningListProps) {
+export function PlanningList({ schedules = [], onRefresh }: PlanningListProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
@@ -41,7 +41,7 @@ export function PlanningList({ schedules, onRefresh }: PlanningListProps) {
               <div key={s.id} className="flex items-center justify-between rounded-lg border p-3">
                 <div>
                   <p className="font-medium text-sm">{s.title}</p>
-                  <p className="text-xs text-gray-500">{s.scheduleUpload ? new Date(s.scheduleUpload).toLocaleDateString('id-ID') : '-'}</p>
+                  <p className="text-xs text-gray-500">{s.scheduledUpload ? new Date(s.scheduledUpload).toLocaleDateString('id-ID') : '-'}</p>
                 </div>
                 <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusMap[s.status]?.className || 'bg-gray-100'}`}>
                   {statusMap[s.status]?.label || s.status}

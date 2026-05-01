@@ -1,3 +1,4 @@
+// features/insight/components/BlacklistPanel.tsx
 'use client';
 
 import { useState } from 'react';

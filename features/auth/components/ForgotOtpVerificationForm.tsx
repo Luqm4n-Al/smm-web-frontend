@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useVerifyForgotOtpMutation } from '../graphql/verify-forgot-otp.mutation';
 import toast from 'react-hot-toast';
 import { FiArrowLeft } from 'react-icons/fi';
 
-export function ForgotOtpVerificationForm() {
+function ForgotOtpVerificationFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get('email') || '';
@@ -83,5 +83,13 @@ export function ForgotOtpVerificationForm() {
         </button>
       </form>
     </div>
+  );
+}
+
+export function ForgotOtpVerificationForm() {
+  return (
+    <Suspense fallback={<div className="w-full max-w-md"><div className="h-64 animate-pulse bg-gray-200 rounded"></div></div>}>
+      <ForgotOtpVerificationFormContent />
+    </Suspense>
   );
 }

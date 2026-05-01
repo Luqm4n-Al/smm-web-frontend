@@ -14,8 +14,18 @@ const NEW_COMMENT_SUBSCRIPTION = gql`
   }
 `;
 
+interface NewCommentData {
+  newComment: {
+    id: string;
+    text: string;
+    author: {
+      name: string;
+    };
+  };
+}
+
 export function useNewCommentSubscription() {
-  const { data, loading, error } = useSubscription(NEW_COMMENT_SUBSCRIPTION);
+  const { data, loading, error } = useSubscription<NewCommentData>(NEW_COMMENT_SUBSCRIPTION);
 
   return {
     newComment: data?.newComment,

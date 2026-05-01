@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useChangeForgottenPasswordMutation } from '../graphql/change-forgotten-password.mutation';
 import { FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
-export function ResetPasswordForm() {
+function ResetPasswordFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || '';
@@ -62,5 +62,13 @@ export function ResetPasswordForm() {
         </button>
       </form>
     </div>
+  );
+}
+
+export function ResetPasswordForm() {
+  return (
+    <Suspense fallback={<div className="w-full max-w-md"><div className="h-48 animate-pulse bg-gray-200 rounded"></div></div>}>
+      <ResetPasswordFormContent />
+    </Suspense>
   );
 }

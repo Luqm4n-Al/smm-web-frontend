@@ -3,6 +3,8 @@
 import { FiHeart, FiEye } from "react-icons/fi"
 import type { PostAnalytics } from "../../graphql/insight.types"
 
+
+
 interface InsightCardProps {
     post: PostAnalytics;
 }

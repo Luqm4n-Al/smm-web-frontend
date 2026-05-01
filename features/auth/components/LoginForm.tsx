@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
 
@@ -11,7 +11,7 @@ interface LoginFormProps {
     isFirstLogin?: boolean;
 }
 
-export function LoginForm({ isFirstLogin: isFirstLoginProp = false }: LoginFormProps = {}) {
+function LoginFormContent({ isFirstLogin: isFirstLoginProp = false }: LoginFormProps = {}) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [username, setUsername] = useState('');
@@ -165,5 +165,13 @@ export function LoginForm({ isFirstLogin: isFirstLoginProp = false }: LoginFormP
                 </button>
             </form>
         </div>
+    );
+}
+
+export function LoginForm(props: LoginFormProps = {}) {
+    return (
+        <Suspense fallback={<div className="w-full max-w-md"><div className="h-64 animate-pulse bg-gray-200 rounded"></div></div>}>
+            <LoginFormContent {...props} />
+        </Suspense>
     );
 }

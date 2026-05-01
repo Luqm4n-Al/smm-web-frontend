@@ -10,7 +10,7 @@ export const GET_CONTENT_SCHEDULES = gql `
             caption
             fileUrl
             status
-            scheduleUpload
+            scheduledUpload
             createdAt
         }
     }

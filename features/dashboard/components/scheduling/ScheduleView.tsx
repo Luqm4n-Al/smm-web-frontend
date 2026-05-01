@@ -16,11 +16,11 @@ export function ScheduleView() {
 
   // Konversi ke event kalender
   const events = schedules
-    .filter(s => s.scheduleUpload)
+    .filter(s => s.scheduledUpload)
     .map(s => ({
-      date: new Date(s.scheduleUpload!),
+      date: new Date(s.scheduledUpload!),
       title: s.title,
-      time: new Date(s.scheduleUpload!).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
+      time: new Date(s.scheduledUpload!).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }),
     }));
 
   return (
