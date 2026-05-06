@@ -25,14 +25,14 @@ export function GeoMap({ data }: GeoMapProps) {
     );
     
     //Debug: uncomment untuk cek apakah code match
-    console.log( 'Checking:', countryCode, '| Match:', entry);
+    // console.log( 'Checking:', countryCode, '| Match:', entry);
 
     if (!entry) return '#e5e7eb';
 
     const value = entry.value;
-    if (value > 5000) return '#1d4ed8';
-    if (value > 1000) return '#3b82f6';
-    if (value > 100) return '#60a5fa';
+    if (value > 500) return '#1d4ed8';
+    if (value > 100) return '#3b82f6';
+    if (value > 50) return '#60a5fa';
     return '#93c5fd';
   };
 
@@ -70,10 +70,10 @@ export function GeoMap({ data }: GeoMapProps) {
         </ParentSize>
       </div>
       <div className="mt-4 flex flex-wrap items-center justify-end gap-3 text-xs">
-        <div className="flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-[#1d4ed8]"></span><span>&gt;8k</span></div>
-        <div className="flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-[#3b82f6]"></span><span>5k - 8k</span></div>
-        <div className="flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-[#60a5fa]"></span><span>3k - 5k</span></div>
-        <div className="flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-[#93c5fd]"></span><span>1k - 3k</span></div>
+        <div className="flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-[#1d4ed8]"></span><span>&gt;1k</span></div>
+        <div className="flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-[#3b82f6]"></span><span>+1000</span></div>
+        <div className="flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-[#60a5fa]"></span><span>+500</span></div>
+        <div className="flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-[#93c5fd]"></span><span>+100</span></div>
         <div className="flex items-center gap-1"><span className="h-3 w-3 rounded-sm bg-[#e5e7eb]"></span><span>Data tidak tersedia</span></div>
       </div>
     </div>
