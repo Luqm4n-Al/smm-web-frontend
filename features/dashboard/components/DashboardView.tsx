@@ -3,19 +3,63 @@
 
 import { useState } from 'react';
 import { PlatformSwitcher } from './PlatfromSwitcher';
-import { usePlatformData } from '../hooks/usePlatformData';
 import { useGetAnalyticsQuery } from '../graphql/analytics.query';
+import { useAnalyticsSubscription } from '../graphql/analytics.subscription';
 import { StatGrid } from './stats/StatGrid';
 import { GrowthLineChart } from './charts/GrowthLineChart';
 
 export function DashboardView() {
   const [platform, setPlatform] = useState<'all' | 'instagram' | 'tiktok'>('all');
 
-  const { stats, loading: statsLoading, error: statsError } = usePlatformData(platform);
+  // HTTP Query untuk initial load
   const { data: queryData, loading: analyticsLoading, error: analyticsError } = useGetAnalyticsQuery();
 
-  const effectiveAnalytics = queryData?.analytics;
+  // WebSocket Subscription untuk real-time updates ⭐ NEW
+  const { liveData } = useAnalyticsSubscription();
+
+  // Prioritize subscription data > query data
+  const effectiveAnalytics = liveData || queryData?.analytics;
   const growth = effectiveAnalytics?.growthMatrix;
+
+  // Filter stats berdasarkan platform + prioritize live data
+  const getFilteredStats = () => {
+    if (!effectiveAnalytics?.socialMedia) return null;
+    
+    const instagram = effectiveAnalytics.socialMedia.instagram;
+    const tiktok = effectiveAnalytics.socialMedia.tiktok;
+    
+    if (platform === 'instagram') {
+      return {
+        followers: instagram.followers,
+        totalViews: instagram.totalViews,
+        totalLikes: instagram.totalLikes,
+        sentiments: instagram.sentiments,
+      };
+    }
+    
+    if (platform === 'tiktok') {
+      return {
+        followers: tiktok.followers,
+        totalViews: tiktok.totalViews,
+        totalLikes: tiktok.totalLikes,
+        sentiments: tiktok.sentiments,
+      };
+    }
+    
+    // All (aggregate)
+    return {
+      followers: instagram.followers + tiktok.followers,
+      totalViews: instagram.totalViews + tiktok.totalViews,
+      totalLikes: instagram.totalLikes + tiktok.totalLikes,
+      sentiments: {
+        positive: instagram.sentiments.positive + tiktok.sentiments.positive,
+        neutral: instagram.sentiments.neutral + tiktok.sentiments.neutral,
+        negative: instagram.sentiments.negative + tiktok.sentiments.negative,
+      },
+    };
+  };
+
+  const filteredStats = getFilteredStats();
 
   // Gabungkan followers, likes, views menjadi satu array per tanggal (global)
   const mergedGrowthData: Array<{
@@ -47,8 +91,8 @@ export function DashboardView() {
     mergedGrowthData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }
 
-  const loading = statsLoading || analyticsLoading;
-  const error = statsError || analyticsError;
+  const loading = analyticsLoading; // Prioritize analytics loading (query + subscription)
+  const error = analyticsError;
 
   if (loading) return <div className="flex justify-center py-20 text-gray-500">Memuat dashboard...</div>;
   if (error) return <div className="flex justify-center py-20 text-red-500">Error: {error.message}</div>;
@@ -59,15 +103,18 @@ export function DashboardView() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-600">Pantau performa akun media sosial Anda.</p>
+          {liveData && (
+            <span className="text-xs text-green-600">● Live update aktif</span>
+          )}
         </div>
         <PlatformSwitcher selected={platform} onChange={setPlatform} />
       </div>
 
-      {stats && (
+      {filteredStats && (
         <StatGrid
-          followers={stats.followers}
-          likes={stats.totalLikes}
-          views={stats.totalViews}
+          followers={filteredStats.followers}
+          likes={filteredStats.totalLikes}
+          views={filteredStats.totalViews}
         />
       )}
 

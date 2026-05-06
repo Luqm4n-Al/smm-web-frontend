@@ -27,6 +27,11 @@ interface NewCommentData {
 export function useNewCommentSubscription() {
   const { data, loading, error } = useSubscription<NewCommentData>(NEW_COMMENT_SUBSCRIPTION);
 
+  // ✅ Added error logging for debugging
+  if (error && process.env.NODE_ENV === 'development') {
+    console.error('❌ [NewComment Subscription] Error:', error.message);
+  }
+
   return {
     newComment: data?.newComment,
     isLoading: loading,

@@ -56,22 +56,31 @@ if (typeof window !== 'undefined') {
     )
   }
 
+  // Helper untuk exponential backoff retry
+  let retryCount = 0;
+  const getRetryDelay = () => {
+    // 1s, 2s, 4s, 8s, max 30s
+    const delay = Math.min(1000 * Math.pow(2, retryCount), 30_000);
+    retryCount += 1;
+    return delay;
+  };
+
   wsClient = createClient({
-    url:
-      wsEndpoint,
+    url: wsEndpoint,
 
-    // Auto reconnect jika koneksi putus
-    shouldRetry: () => true,
-    retryAttempts: 3,
-
-    // Inject token saat koneksi WebSocket dibuat
-    connectionParams: () => {
-      const token = localStorage.getItem('token');
-      return {
-        Authorization: token ? `Bearer ${token}` : '',
-      };
+    // Auto reconnect dengan exponential backoff
+    shouldRetry: (count) => {
+      if (count > 5) {
+        console.warn('⚠️  [WS] Max retry attempts (5) reached. Stopping reconnection.');
+        return false;
+      }
+      return true;
     },
 
+    retryAttempts: 5,
+    keepalive: 10_000, // Keep-alive every 10 seconds
+    
+    // ✅ IMPROVED: Exponential backoff untuk reconnection
     on: {
       connecting: () => {
         if (process.env.NODE_ENV === 'development') {
@@ -80,23 +89,10 @@ if (typeof window !== 'undefined') {
       },
 
       connected: () => {
+        retryCount = 0; // Reset retry counter on successful connection
         sessionStorage.removeItem('ws_error_logged');
         console.log('✅ [WS] Connected!');
       },
-
-
-      // Udh nggak dipake
-      // |
-      // |
-      // reconnecting: () => {
-      //   if (process.env.NODE_ENV === 'development') {
-      //     console.log('🔄 [WS] Reconnecting...');
-      //   }
-      // },
-
-      // reconnected: () => {
-      //   console.log('✅ [WS] Reconnected!');
-      // },
 
       closed: () => {
         console.warn('⚠️  [WS] Connection closed');
@@ -105,13 +101,22 @@ if (typeof window !== 'undefined') {
       error: (error) => {
         const errorKey = 'ws_error_logged';
         if (!sessionStorage.getItem(errorKey)) {
+          const delay = getRetryDelay();
           console.warn(
-            `⚠️  [WS] Connection failed. Endpoint: ${process.env.NEXT_PUBLIC_WS_ENDPOINT}`,
+            `⚠️  [WS] Connection failed (retry in ${delay}ms). Endpoint: ${process.env.NEXT_PUBLIC_WS_ENDPOINT}`,
             error ?? '(no details)'
           );
           sessionStorage.setItem(errorKey, 'true');
         }
       },
+    },
+
+    // Inject token saat koneksi WebSocket dibuat
+    connectionParams: () => {
+      const token = localStorage.getItem('token');
+      return {
+        Authorization: token ? `Bearer ${token}` : '',
+      };
     },
   });
 }
