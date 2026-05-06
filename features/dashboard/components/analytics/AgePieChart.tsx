@@ -12,7 +12,10 @@ interface AgePieChartProps {
   data: AgeData[];
 }
 
+const UNKNOWN_LABEL = 'Tidak diketahui';
+
 export function AgePieChart({ data }: AgePieChartProps) {
+  // Kondisi tidak ada data
   if (!data || data.length === 0) {
     return (
       <div className="rounded-lg border bg-white p-6 shadow-sm">
@@ -22,9 +25,19 @@ export function AgePieChart({ data }: AgePieChartProps) {
     );
   }
 
+  // Pisahkan data yang dikenal dan tidak diketahui
+  const unknownData = data.find(d => d.age.toLowerCase() === 'unknown');
+  const knownData = data.filter(d => d.age.toLowerCase() !== 'unknown');
+
+  const totalKnown = knownData.reduce((sum, d) => sum + d.quantity, 0);
+  const unknownQuantity = unknownData?.quantity || 0;
+  const totalAll = totalKnown + unknownQuantity;
+  const unknownPercent = totalAll > 0 ? Math.round((unknownQuantity / totalAll) * 100) : 0;
+
+  // Warna untuk data dikenal
   const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'];
-  
-  const chartData = data.map((item, index) => ({
+
+  const chartData = knownData.map((item, index) => ({
     name: item.age,
     value: item.quantity,
     color: colors[index % colors.length],
@@ -45,19 +58,41 @@ export function AgePieChart({ data }: AgePieChartProps) {
   return (
     <div className="rounded-lg border bg-white p-6 shadow-sm">
       <h2 className="mb-4 text-lg font-medium text-gray-900">Usia Audiens</h2>
-      <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie data={chartData} cx="50%" cy="50%" labelLine={false} label={renderCustomizedLabel} outerRadius={80} dataKey="value">
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip formatter={(value) => `${value}`} />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
+
+      {chartData.length === 0 ? (
+        <div className="flex h-64 items-center justify-center text-gray-500">
+          Seluruh data usia tidak diketahui
+        </div>
+      ) : (
+        <div className="h-64">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={chartData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={renderCustomizedLabel}
+                outerRadius={80}
+                dataKey="value"
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip formatter={(value) => `${value}`} />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {/* Informasi tambahan: persentase tidak diketahui */}
+      {unknownQuantity > 0 && (
+        <div className="mt-4 border-t pt-3 text-center text-sm text-gray-600">
+          <span className="font-medium">{UNKNOWN_LABEL}:</span> {unknownQuantity} ({unknownPercent}%)
+        </div>
+      )}
     </div>
   );
 }

@@ -14,23 +14,31 @@ import { FiTrendingUp } from 'react-icons/fi';
 
 interface DataPoint {
   date: string;
-  followers: number;
-  likes?: number;
-  views?: number;
+  [key: string]: any; // untuk mendukung dataKey dinamis
+}
+
+interface LineConfig {
+  dataKey: string;
+  color: string;
+  name?: string;
 }
 
 interface GrowthLineChartProps {
   data: DataPoint[];
   title?: string;
-  dataKey?: 'followers' | 'likes' | 'views';
+  // Properti lama (single line) tetap didukung
+  dataKey?: string;
   color?: string;
+  // Properti baru untuk multi‑line
+  lines?: LineConfig[];
 }
 
 export function GrowthLineChart({
   data,
-  title = 'Pertumbuhan Followers',
-  dataKey = 'followers',
+  title = 'Pertumbuhan',
+  dataKey,
   color = '#2563eb',
+  lines,
 }: GrowthLineChartProps) {
   // Jika data kosong, tampilkan placeholder
   if (!data || data.length === 0) {
@@ -46,6 +54,10 @@ export function GrowthLineChart({
       </div>
     );
   }
+
+  // Tentukan konfigurasi garis: jika `lines` disediakan, gunakan itu;
+  // jika tidak, fallback ke perilaku single line.
+  const activeLines = lines || [{ dataKey: dataKey || 'followers', color, name: dataKey || 'followers' }];
 
   return (
     <div className="rounded-lg border bg-white p-6 shadow-sm">
@@ -79,7 +91,6 @@ export function GrowthLineChart({
                 borderRadius: '0.5rem',
                 boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
               }}
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               formatter={(value: any, name: any) => {
                 if (typeof value === 'number') {
                   return [value.toLocaleString(), name];
@@ -87,17 +98,35 @@ export function GrowthLineChart({
                 return [value ?? '', name];
               }}
             />
-            <Line
-              type="monotone"
-              dataKey={dataKey}
-              stroke={color}
-              strokeWidth={2}
-              dot={{ r: 3, fill: color }}
-              activeDot={{ r: 6, fill: color }}
-            />
+            {activeLines.map((line) => (
+              <Line
+                key={line.dataKey}
+                type="monotone"
+                dataKey={line.dataKey}
+                stroke={line.color}
+                strokeWidth={2}
+                dot={{ r: 3, fill: line.color }}
+                activeDot={{ r: 6, fill: line.color }}
+                name={line.name || line.dataKey}
+              />
+            ))}
           </LineChart>
         </ResponsiveContainer>
       </div>
+      {/* Legenda opsional */}
+      {activeLines.length > 1 && (
+        <div className="mt-4 flex justify-center gap-4 text-xs text-gray-600">
+          {activeLines.map((line) => (
+            <div key={line.dataKey} className="flex items-center gap-1.5">
+              <span
+                className="h-3 w-3 rounded-full"
+                style={{ backgroundColor: line.color }}
+              />
+              <span>{line.name || line.dataKey}</span>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

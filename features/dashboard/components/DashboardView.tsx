@@ -1,3 +1,4 @@
+// features/dashboard/components/DashboardView.tsx
 'use client';
 
 import { useState } from 'react';
@@ -10,17 +11,41 @@ import { GrowthLineChart } from './charts/GrowthLineChart';
 export function DashboardView() {
   const [platform, setPlatform] = useState<'all' | 'instagram' | 'tiktok'>('all');
 
-  // Query awal
   const { stats, loading: statsLoading, error: statsError } = usePlatformData(platform);
   const { data: queryData, loading: analyticsLoading, error: analyticsError } = useGetAnalyticsQuery();
 
-  // Gabungkan: jika liveData ada, gunakan; jika tidak, gunakan data query
   const effectiveAnalytics = queryData?.analytics;
   const growth = effectiveAnalytics?.growthMatrix;
-  const followerGrowth = growth?.followers?.map(item => ({
-    date: item.date,
-    followers: item.quantity,
-  })) || [];
+
+  // Gabungkan followers, likes, views menjadi satu array per tanggal (global)
+  const mergedGrowthData: Array<{
+    date: string;
+    followers?: number;
+    likes?: number;
+    views?: number;
+  }> = [];
+
+  if (growth) {
+    const dateSet = new Set<string>();
+    growth.followers?.forEach(f => dateSet.add(f.date));
+    growth.likes?.forEach(l => dateSet.add(l.date));
+    growth.views?.forEach(v => dateSet.add(v.date));
+
+    dateSet.forEach(date => {
+      const followerEntry = growth.followers?.find(f => f.date === date);
+      const likeEntry = growth.likes?.find(l => l.date === date);
+      const viewEntry = growth.views?.find(v => v.date === date);
+
+      mergedGrowthData.push({
+        date,
+        followers: followerEntry?.quantity,
+        likes: likeEntry?.quantity,
+        views: viewEntry?.quantity,
+      });
+    });
+
+    mergedGrowthData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+  }
 
   const loading = statsLoading || analyticsLoading;
   const error = statsError || analyticsError;
@@ -47,11 +72,20 @@ export function DashboardView() {
       )}
 
       <GrowthLineChart
-        data={followerGrowth}
-        title="Pertumbuhan Followers (Global)"
-        dataKey="followers"
-        color="#2563eb"
+        data={mergedGrowthData}
+        title={`Pertumbuhan Followers, Likes, dan Views (Global)`}
+        lines={[
+          { dataKey: 'followers', color: '#2563eb', name: 'Followers' },
+          { dataKey: 'likes', color: '#10b981', name: 'Likes' },
+          { dataKey: 'views', color: '#f59e0b', name: 'Views' },
+        ]}
       />
+
+      {platform !== 'all' && (
+        <p className="text-xs text-gray-400 text-center">
+          * Data pertumbuhan bersifat global (gabungan semua platform)
+        </p>
+      )}
     </div>
   );
 }

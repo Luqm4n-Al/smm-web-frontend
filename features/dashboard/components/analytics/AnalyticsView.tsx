@@ -1,10 +1,11 @@
+// features/dashboard/components/Analytics/AnalyticsView.tsx
 'use client';
 
-import { useState } from 'react';
+import { useState } from 'react'; // 🆕 useEffect
 import { PlatformSwitcher } from '../PlatfromSwitcher';
 import { usePlatformData } from '../../hooks/usePlatformData';
 import { useGetAnalyticsQuery } from '../../graphql/analytics.query';
-import { useAnalyticsSubscription } from '../../graphql/analytics.subscription'; // 🆕
+import { useAnalyticsSubscription } from '../../graphql/analytics.subscription';
 import { SentimentSection } from './SentimentSection';
 import { AgePieChart } from './AgePieChart';
 import { GenderChart } from './GenderChart';
@@ -15,7 +16,7 @@ export function AnalyticsView() {
 
   const { stats, loading: statsLoading, error: statsError } = usePlatformData(platform);
   const { data: queryData, loading, error } = useGetAnalyticsQuery();
-  const { liveData } = useAnalyticsSubscription(); // Data real-time webscoket
+  const { liveData } = useAnalyticsSubscription();
 
   // Gabungkan data
   const effectiveAnalytics = liveData || queryData?.analytics;
@@ -24,8 +25,9 @@ export function AnalyticsView() {
     h => h.level.toLocaleLowerCase() === 'country' && h.code !== 'UNKNOWN'
   ) || [];
 
+
   const isLoading = (statsLoading || loading) && !liveData;
-  const activeError = !liveData ? (statsError || error) : null
+  const activeError = !liveData ? (statsError || error) : null;
 
   if (isLoading) return <div className="flex justify-center py-20 text-gray-500">Memuat analytics...</div>;
   if (activeError) return <div className="flex justify-center py-20 text-red-500">Error: {activeError.message}</div>;
