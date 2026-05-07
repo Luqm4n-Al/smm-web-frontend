@@ -2,9 +2,7 @@ import { gql } from '@apollo/client';
 import { useSubscription } from '@apollo/client/react';
 import type { Analytics } from './analytics.types';
 
-// ============================================================
 // GraphQL SUBSCRIPTION untuk Real-time Analytics Updates
-// ============================================================
 // 
 // Query ini subscribe ke server untuk menerima update analytics
 // secara real-time ketika ada perubahan data.
