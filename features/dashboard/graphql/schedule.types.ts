@@ -16,3 +16,10 @@ export interface CreateContentScheduleInput {
     fileUrl?: string;
     scheduledUpload?: string; 
 }
+
+export interface UpdateContentScheduleInput {
+    title?: string;
+    caption?: string;
+    fileUrl?: string;
+    scheduledUpload?: string;
+}

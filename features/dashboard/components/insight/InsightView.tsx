@@ -8,11 +8,14 @@ import { useGetCommentBlackListsQuery } from '../../graphql/commentBlacklists.qu
 import { InsightCard } from './InsightCard';
 import { BlacklistPanel } from './BlacklistPanel';
 
-const PAGE_SIZE = 12; // Jumlah item per halaman
+const PAGE_SIZE = 12;
+
+// 🆕 Tipe untuk field pengurutan agar tidak menggunakan 'any'
+type SortField = 'DATE' | 'LIKE' | 'VIEW' | 'SENTIMENT';
 
 export function InsightView() {
   const [platform, setPlatform] = useState<'all' | 'instagram' | 'tiktok'>('all');
-  const [sortField, setSortField] = useState<'DATE' | 'LIKE' | 'VIEW' | 'SENTIMENT'>('DATE');
+  const [sortField, setSortField] = useState<SortField>('DATE');
   const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('DESC');
   const [page, setPage] = useState(0);
 
@@ -20,7 +23,7 @@ export function InsightView() {
     platform: platform === 'all' ? undefined : platform === 'instagram' ? 'INSTAGRAM' as const : 'TIKTOK' as const,
     sortField,
     sortOrder,
-    limit: PAGE_SIZE + 1, // Ambil satu ekstra untuk deteksi halaman berikutnya
+    limit: PAGE_SIZE + 1,
     offset: page * PAGE_SIZE,
   };
 
@@ -32,7 +35,7 @@ export function InsightView() {
 
   const allPosts = postsData?.posts || [];
   const hasNextPage = allPosts.length > PAGE_SIZE;
-  const posts = allPosts.slice(0, PAGE_SIZE); // Hanya tampilkan sejumlah halaman
+  const posts = allPosts.slice(0, PAGE_SIZE);
 
   const blacklists = blacklistData?.commentBlackLists || [];
 
@@ -47,7 +50,7 @@ export function InsightView() {
           <PlatformSwitcher selected={platform} onChange={setPlatform} />
           <select
             value={sortField}
-            onChange={(e) => setSortField(e.target.value as any)}
+            onChange={(e) => setSortField(e.target.value as SortField)}
             className="rounded-md border border-gray-300 px-3 py-1.5 text-sm"
           >
             <option value="DATE">Tanggal</option>
@@ -77,7 +80,6 @@ export function InsightView() {
                 ))}
               </div>
 
-              {/* Pagination */}
               <div className="mt-6 flex items-center justify-between border-t pt-4">
                 <p className="text-sm text-gray-600">
                   Halaman {page + 1}

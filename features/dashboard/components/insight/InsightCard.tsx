@@ -2,6 +2,7 @@
 
 import { FiHeart, FiEye } from "react-icons/fi"
 import type { PostAnalytics } from "../../graphql/insight.types"
+import Image from "next/image";
 
 
 
@@ -22,7 +23,7 @@ export function InsightCard({post}: InsightCardProps) {
         <div className="rounded-lg border bg-white shadow-sm overflow-hidden">
             <div className="aspect-square bg-gray-100 relative">
                 {post.fileUrl ? (
-                    <img src={post.fileUrl} alt={post.caption}  className="w-full h-full object-cover"/>
+                    <Image src={post.fileUrl} alt={post.caption}  className="w-full h-full object-cover"/>
 
                 ) : (
                     <div className="flex items-center justify-center h-full text-gray-400">

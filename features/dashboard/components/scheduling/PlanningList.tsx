@@ -1,24 +1,44 @@
+// features/scheduling/components/PlanningList.tsx
 'use client';
 
 import { useState } from 'react';
-import { FiPlus } from 'react-icons/fi';
+import { FiPlus, FiEdit, FiCheck } from 'react-icons/fi';
 import { CreatePlanModal } from './CreatePlanModal';
+import { useMarkAsPosted } from '../../graphql/mark-posted.mutation';
 import type { ContentSchedule } from '../../graphql/schedule.types';
-import type { ApolloQueryResult } from '@apollo/client';
+import toast from 'react-hot-toast';
 
-const statusMap: Record<string, { label: string; className: string }> = {
-  DRAFT: { label: 'Draft', className: 'bg-gray-100 text-gray-700' },
-  SCHEDULED: { label: 'Terjadwal', className: 'bg-yellow-100 text-yellow-700' },
-  POSTED: { label: 'Dipublikasi', className: 'bg-green-100 text-green-700' },
-};
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  return 'Terjadi kesalahan';
+}
 
 interface PlanningListProps {
   schedules?: ContentSchedule[];
-  onRefresh: () => Promise<any>;
+  onRefresh: () => Promise<void>;
 }
 
 export function PlanningList({ schedules = [], onRefresh }: PlanningListProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingPlan, setEditingPlan] = useState<{
+    id: string;
+    title: string;
+    scheduledUpload?: string;
+  } | null>(null);
+  const [markAsPosted] = useMarkAsPosted();
+
+  const handleMarkAsPosted = async (id: string) => {
+    try {
+      await markAsPosted({ variables: { id } });
+      toast.success('Status diubah menjadi Dipublikasi');
+      onRefresh();
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
+    }
+  };
+
+  
 
   return (
     <>
@@ -33,19 +53,44 @@ export function PlanningList({ schedules = [], onRefresh }: PlanningListProps) {
             Tambah Plan
           </button>
         </div>
-        <div className="space-y-2 max-h-125 overflow-y-auto">
+        <div className="space-y-2 max-h-[500px] overflow-y-auto">
           {schedules.length === 0 ? (
             <p className="text-center text-sm text-gray-500 py-4">Belum ada rencana.</p>
           ) : (
             schedules.map(s => (
               <div key={s.id} className="flex items-center justify-between rounded-lg border p-3">
-                <div>
+                <div className="flex-1">
                   <p className="font-medium text-sm">{s.title}</p>
-                  <p className="text-xs text-gray-500">{s.scheduledUpload ? new Date(s.scheduledUpload).toLocaleDateString('id-ID') : '-'}</p>
+                  <p className="text-xs text-gray-500">
+                    {s.scheduledUpload ? new Date(s.scheduledUpload).toLocaleDateString('id-ID') : '-'}
+                  </p>
                 </div>
-                <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusMap[s.status]?.className || 'bg-gray-100'}`}>
-                  {statusMap[s.status]?.label || s.status}
-                </span>
+                <div className="flex items-center gap-2">
+                  {s.status !== 'POSTED' && (
+                    <>
+                      <button
+                        onClick={() =>
+                          setEditingPlan({
+                            id: s.id,
+                            title: s.title,
+                            scheduledUpload: s.scheduledUpload || undefined,
+                          })
+                        }
+                        className="ml-2 text-blue-600 hover:text-blue-800"
+                        title="Edit plan"
+                      >
+                        <FiEdit className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleMarkAsPosted(s.id)}
+                        className="ml-2 text-green-600 hover:text-green-800"
+                        title="Tandai selesai"
+                      >
+                        <FiCheck className="h-4 w-4" />
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
             ))
           )}
@@ -53,9 +98,10 @@ export function PlanningList({ schedules = [], onRefresh }: PlanningListProps) {
       </div>
 
       <CreatePlanModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSuccess={() => { setIsModalOpen(false); onRefresh(); }}
+        isOpen={isModalOpen || editingPlan !== null}
+        onClose={() => { setIsModalOpen(false); setEditingPlan(null); }}
+        onSuccess={() => { setIsModalOpen(false); setEditingPlan(null); onRefresh(); }}
+        existingPlan={editingPlan}
       />
     </>
   );

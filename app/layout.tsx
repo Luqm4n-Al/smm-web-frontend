@@ -1,3 +1,5 @@
+//app/layout.tsx
+
 import '@/app/globals.css';
 import { Providers } from '@/lib/providers';
 import { ClientLayoutWrapper } from './ClientLayoutWrapper';
@@ -5,8 +7,13 @@ import type { Metadata } from 'next';
 import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
-  title: 'SMM Web',
+  title: 'Social Vista',
   description: 'Social Media Management Web Application',
+    icons: {
+    icon: '/logo-icon.svg',   // SVG juga bisa untuk favicon modern
+    shortcut: '/logo-icon.png', // Fallback PNG
+    apple: '/logo-icon.png',
+  },
 };
 
 export default function RootLayout({

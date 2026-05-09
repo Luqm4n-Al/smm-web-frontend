@@ -1,6 +1,7 @@
+// features/profile/components/ProfileForm.tsx
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
@@ -14,6 +15,13 @@ import { useChangePhoneMutation } from '../graphql/change-phone.mutation';
 import { useChangeSocialAccountMutation } from '../graphql/change-social-account.mutation';
 import type { SocialAccountInput, SocialAccount } from '../graphql/profile.types';
 
+// Helper bebas any
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  return 'Terjadi kesalahan';
+}
+
 export function ProfileForm() {
   const router = useRouter();
   const { data, loading: profileLoading, error } = useGetProfileQuery();
@@ -21,37 +29,24 @@ export function ProfileForm() {
   const [changePhone, { loading: phoneLoading }] = useChangePhoneMutation();
   const [changeSocial, { loading: socialLoading }] = useChangeSocialAccountMutation();
 
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-  const [phone, setPhone] = useState('');
-  const [instagram, setInstagram] = useState('');
-  const [tiktok, setTiktok] = useState('');
-  const [apiKey, setApiKey] = useState('');
-  const initializedRef = useRef(false);
+  const phoneRef = useRef<HTMLInputElement>(null);
+  const instagramRef = useRef<HTMLInputElement>(null);
+  const tiktokRef = useRef<HTMLInputElement>(null);
+  const apiKeyRef = useRef<HTMLInputElement>(null);
 
-  // Isi form saat data profil tersedia  
-  // Pattern: Initialize form state once from loaded data using ref guard
-  // This prevents cascading renders since initializedRef.current ensures single execution
-  useEffect(() => {
-    if (!data?.UserInfo || initializedRef.current) return;
-    
-    initializedRef.current = true;
-    
-    // Set all form state from profile data
-    setPhone(data.UserInfo.phone);
-    setAvatarPreview(data.UserInfo.avatar || null);
-    
-    const insta = (data.UserInfo.social_account as SocialAccount[]).find((s) => s.platform === 'instagram');
-    const tiktokAcc = (data.UserInfo.social_account as SocialAccount[]).find((s) => s.platform === 'tiktok');
-    
-    if (insta) {
-      setInstagram(insta.username || '');
-      setApiKey(insta.api_key || '');
-    }
-    
-    if (tiktokAcc) {
-      setTiktok(tiktokAcc.username || '');
-    }
-  }, [data]);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+  const profile = data?.UserInfo;
+
+  // ✅ Gunakan tipe spesifik SocialAccount[]
+  const socialAccounts: SocialAccount[] = profile?.social_account ?? [];
+  const instagramAccount = socialAccounts.find(s => s.platform === 'instagram');
+  const tiktokAccount = socialAccounts.find(s => s.platform === 'tiktok');
+
+  const defaultPhone = profile?.phone || '';
+  const defaultInstagram = instagramAccount?.username || '';
+  const defaultTiktok = tiktokAccount?.username || '';
+  const defaultApiKey = instagramAccount?.api_key || '';
 
   const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -60,9 +55,12 @@ export function ProfileForm() {
       toast.error('Ukuran file maksimal 2MB');
       return;
     }
-    // Preview
     const reader = new FileReader();
-    reader.onloadend = () => setAvatarPreview(reader.result as string);
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        setAvatarPreview(reader.result);
+      }
+    };
     reader.readAsDataURL(file);
 
     try {
@@ -70,47 +68,43 @@ export function ProfileForm() {
       if (result.data?.changeAvatar) {
         toast.success('Avatar berhasil diubah');
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Gagal mengubah avatar';
-      toast.error(errorMessage);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     }
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    const isPhoneLoading = phoneLoading;
-    const isSocialLoading = socialLoading;
-    if (isPhoneLoading || isSocialLoading) return;
+    const newPhone = phoneRef.current?.value || '';
+    const newInstagram = instagramRef.current?.value.trim() || '';
+    const newTiktok = tiktokRef.current?.value.trim() || '';
+    const newApiKey = apiKeyRef.current?.value.trim() || '';
 
     try {
-      // Ubah phone jika berbeda
-      if (phone !== data?.UserInfo?.phone) {
-        await changePhone({ variables: { input: phone } });
+      if (newPhone !== defaultPhone) {
+        await changePhone({ variables: { input: newPhone } });
         toast.success('Nomor telepon diperbarui');
       }
 
-      // Siapkan input social account
       const socialInput: SocialAccountInput[] = [];
-      if (instagram) {
-        socialInput.push({ platform: 'instagram', username: instagram, apiKey: apiKey || undefined });
+      if (newInstagram) {
+        socialInput.push({ platform: 'instagram', username: newInstagram, apiKey: newApiKey || undefined });
       }
-      if (tiktok) {
-        socialInput.push({ platform: 'tiktok', username: tiktok });
+      if (newTiktok) {
+        socialInput.push({ platform: 'tiktok', username: newTiktok });
       }
-      
-      // Hanya kirim mutation jika ada social account yang diupdate
+
       if (socialInput.length > 0) {
         await changeSocial({ variables: { input: socialInput } });
         toast.success('Akun media sosial diperbarui');
       }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Gagal menyimpan perubahan';
-      toast.error(errorMessage);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     }
   };
 
-  if (profileLoading) return <div>Memuat profil...</div>;
-  if (error) return <div>Error memuat profil</div>;
+  if (profileLoading) return <div className="flex justify-center py-10 text-gray-500">Memuat profil...</div>;
+  if (error) return <div className="flex justify-center py-10 text-red-500">Error: {error.message}</div>;
 
   const inputClass = 'mt-1 block w-full rounded-md border border-gray-300 px-4 py-2.5 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500';
   const labelClass = 'block text-sm font-medium text-gray-700';
@@ -127,14 +121,20 @@ export function ProfileForm() {
         {/* Avatar Section */}
         <div className="flex items-center gap-5">
           <div className="relative">
-            {avatarPreview ? (
+            {avatarPreview || profile?.avatar ? (
               <div className="h-20 w-20 rounded-full overflow-hidden ring-2 ring-blue-100">
-                <Image src={avatarPreview} alt="Avatar" width={80} height={80} className="h-full w-full object-cover" />
+                <Image
+                  src={avatarPreview || profile?.avatar || ''}
+                  alt="Avatar"
+                  width={80}
+                  height={80}
+                  className="h-full w-full object-cover"
+                />
               </div>
             ) : (
               <div className="h-20 w-20 rounded-full bg-linear-to-br from-blue-100 to-blue-200 flex items-center justify-center ring-2 ring-blue-100">
                 <span className="text-2xl font-bold text-blue-600">
-                  {data?.UserInfo?.username?.charAt(0).toUpperCase()}
+                  {profile?.username?.charAt(0).toUpperCase()}
                 </span>
               </div>
             )}
@@ -157,14 +157,14 @@ export function ProfileForm() {
               <label className={labelClass}>Username</label>
               <div className="relative mt-1">
                 <span className={iconClass}><FiUser className="h-4 w-4" /></span>
-                <input type="text" value={data?.UserInfo?.username || ''} disabled className={`${inputClass} pl-10`} />
+                <input type="text" value={profile?.username || ''} disabled className={`${inputClass} pl-10`} />
               </div>
             </div>
             <div>
               <label className={labelClass}>Email</label>
               <div className="relative mt-1">
                 <span className={iconClass}><FiMail className="h-4 w-4" /></span>
-                <input type="email" value={data?.UserInfo?.email || ''} disabled className={`${inputClass} pl-10`} />
+                <input type="email" value={profile?.email || ''} disabled className={`${inputClass} pl-10`} />
               </div>
               <p className="mt-1 text-xs text-gray-500">Email tidak dapat diubah</p>
             </div>
@@ -172,7 +172,13 @@ export function ProfileForm() {
               <label htmlFor="phone" className={labelClass}>No. HP</label>
               <div className="relative mt-1">
                 <span className={iconClass}><FiPhone className="h-4 w-4" /></span>
-                <input id="phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} className={`${inputClass} pl-10`} />
+                <input
+                  id="phone"
+                  type="tel"
+                  defaultValue={defaultPhone}
+                  ref={phoneRef}
+                  className={`${inputClass} pl-10`}
+                />
               </div>
             </div>
           </div>
@@ -186,21 +192,42 @@ export function ProfileForm() {
               <label htmlFor="instagram" className={labelClass}>Instagram Username</label>
               <div className="relative mt-1">
                 <span className={iconClass}><FiInstagram className="h-4 w-4" /></span>
-                <input id="instagram" type="text" value={instagram} onChange={e => setInstagram(e.target.value)} className={`${inputClass} pl-10`} placeholder="username_ig" />
+                <input
+                  id="instagram"
+                  type="text"
+                  defaultValue={defaultInstagram}
+                  ref={instagramRef}
+                  className={`${inputClass} pl-10`}
+                  placeholder="username_ig"
+                />
               </div>
             </div>
             <div>
               <label htmlFor="apiKey" className={labelClass}>Api Key (Optional)</label>
               <div className="relative mt-1">
                 <span className={iconClass}><FiKey className="h-4 w-4" /></span>
-                <input id="apiKey" type="text" value={apiKey} onChange={e => setApiKey(e.target.value)} className={`${inputClass} pl-10`} placeholder="Optional" />
+                <input
+                  id="apiKey"
+                  type="text"
+                  defaultValue={defaultApiKey}
+                  ref={apiKeyRef}
+                  className={`${inputClass} pl-10`}
+                  placeholder="Optional"
+                />
               </div>
             </div>
             <div>
               <label htmlFor="tiktok" className={labelClass}>TikTok Username</label>
               <div className="relative mt-1">
                 <span className={iconClass}><FiVideo className="h-4 w-4" /></span>
-                <input id="tiktok" type="text" value={tiktok} onChange={e => setTiktok(e.target.value)} className={`${inputClass} pl-10`} placeholder="username_tiktok" />
+                <input
+                  id="tiktok"
+                  type="text"
+                  defaultValue={defaultTiktok}
+                  ref={tiktokRef}
+                  className={`${inputClass} pl-10`}
+                  placeholder="username_tiktok"
+                />
               </div>
             </div>
           </div>
@@ -209,39 +236,35 @@ export function ProfileForm() {
         {/* Tombol Aksi */}
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-between">
           <div className="flex flex-wrap gap-3">
-            <button 
-              type="button" 
-              onClick={() => toast.success('Laporan sedang disiapkan...')} 
+            <button
+              type="button"
+              onClick={() => toast.success('Laporan sedang disiapkan...')}
               className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
             >
-              <FiDownload className="h-4 w-4" /> 
-              Download Account Report
+              <FiDownload className="h-4 w-4" /> Download Account Report
             </button>
-            <button 
-              type="button" 
-              onClick={() => router.push('/change-password')} 
+            <button
+              type="button"
+              onClick={() => router.push('/change-password')}
               className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
             >
-              <FiLock className="h-4 w-4" /> 
-              Change Password
+              <FiLock className="h-4 w-4" /> Change Password
             </button>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button 
-              type="button" 
-              onClick={() => router.push('/dashboard')} 
+            <button
+              type="button"
+              onClick={() => router.push('/dashboard')}
               className="flex items-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
             >
-              <FiArrowLeft className="h-4 w-4" /> 
-              Kembali ke Dashboard
+              <FiArrowLeft className="h-4 w-4" /> Kembali ke Dashboard
             </button>
-            <button 
-              type="submit" 
-              disabled={phoneLoading || socialLoading} 
+            <button
+              type="submit"
+              disabled={phoneLoading || socialLoading}
               className="flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <FiSave className="h-4 w-4" /> 
-              {phoneLoading || socialLoading ? 'Menyimpan...' : 'Simpan perubahan'}
+              <FiSave className="h-4 w-4" /> {phoneLoading || socialLoading ? 'Menyimpan...' : 'Simpan perubahan'}
             </button>
           </div>
         </div>

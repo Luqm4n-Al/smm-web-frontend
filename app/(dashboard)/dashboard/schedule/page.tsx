@@ -1,4 +1,4 @@
-
+//app/(dashboard)/schedule/page.tsx
 import { ScheduleView } from "@/features/dashboard/components/scheduling/ScheduleView";
 
 export default function SchedulePage() {

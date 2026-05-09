@@ -14,7 +14,7 @@ import { FiTrendingUp } from 'react-icons/fi';
 
 interface DataPoint {
   date: string;
-  [key: string]: any; // untuk mendukung dataKey dinamis
+  [key: string]: string | number | undefined; // 🆕 bukan `any`
 }
 
 interface LineConfig {
@@ -26,10 +26,8 @@ interface LineConfig {
 interface GrowthLineChartProps {
   data: DataPoint[];
   title?: string;
-  // Properti lama (single line) tetap didukung
   dataKey?: string;
   color?: string;
-  // Properti baru untuk multi‑line
   lines?: LineConfig[];
 }
 
@@ -40,7 +38,6 @@ export function GrowthLineChart({
   color = '#2563eb',
   lines,
 }: GrowthLineChartProps) {
-  // Jika data kosong, tampilkan placeholder
   if (!data || data.length === 0) {
     return (
       <div className="rounded-lg border bg-white p-6 shadow-sm">
@@ -55,9 +52,16 @@ export function GrowthLineChart({
     );
   }
 
-  // Tentukan konfigurasi garis: jika `lines` disediakan, gunakan itu;
-  // jika tidak, fallback ke perilaku single line.
-  const activeLines = lines || [{ dataKey: dataKey || 'followers', color, name: dataKey || 'followers' }];
+  const activeLines = lines || [
+    { dataKey: dataKey || 'followers', color, name: dataKey || 'followers' },
+  ];
+
+  // ✅ Formatter sesuai tipe Recharts (value bisa undefined)
+  const tooltipFormatter = (value: unknown, name: unknown): [string, string] => {
+    const formattedValue = typeof value === 'number' ? value.toLocaleString() : String(value ?? '');
+    const formattedName = typeof name === 'string' ? name : String(name ?? '');
+    return [formattedValue, formattedName];
+  };
 
   return (
     <div className="rounded-lg border bg-white p-6 shadow-sm">
@@ -82,7 +86,7 @@ export function GrowthLineChart({
               tick={{ fontSize: 12, fill: '#6b7280' }}
               axisLine={{ stroke: '#d1d5db' }}
               tickLine={false}
-              tickFormatter={(value) => value.toLocaleString()}
+              tickFormatter={(value: number) => value.toLocaleString()}
             />
             <Tooltip
               contentStyle={{
@@ -91,12 +95,7 @@ export function GrowthLineChart({
                 borderRadius: '0.5rem',
                 boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
               }}
-              formatter={(value: any, name: any) => {
-                if (typeof value === 'number') {
-                  return [value.toLocaleString(), name];
-                }
-                return [value ?? '', name];
-              }}
+              formatter={tooltipFormatter}
             />
             {activeLines.map((line) => (
               <Line
@@ -113,7 +112,6 @@ export function GrowthLineChart({
           </LineChart>
         </ResponsiveContainer>
       </div>
-      {/* Legenda opsional */}
       {activeLines.length > 1 && (
         <div className="mt-4 flex justify-center gap-4 text-xs text-gray-600">
           {activeLines.map((line) => (

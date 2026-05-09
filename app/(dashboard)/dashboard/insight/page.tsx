@@ -1,3 +1,4 @@
+//app/(dashboard)/dashboard/insight/page.tsx
 import { InsightView } from "@/features/dashboard/components/insight/InsightView";
 
 

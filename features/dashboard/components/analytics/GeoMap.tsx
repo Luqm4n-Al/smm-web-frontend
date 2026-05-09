@@ -373,7 +373,7 @@ export function GeoMap({ data }: GeoMapProps) {
                           }}
 
                           // Saat mouse bergerak
-                          onMouseMove={(evt) => {
+                          onMouseMove={(evt: React.MouseEvent) => {
 
                             // Update posisi tooltip
                             const pos =

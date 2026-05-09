@@ -12,6 +12,13 @@ interface BlacklistPanelProps {
   blacklists: CommentBlackList[];
 }
 
+// Helper mengambil pesan error dari berbagai tipe
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  return 'Terjadi kesalahan';
+}
+
 export function BlacklistPanel({ blacklists }: BlacklistPanelProps) {
   const [newWord, setNewWord] = useState('');
   const [addBlacklist] = useAddBlacklistMutation();
@@ -23,8 +30,8 @@ export function BlacklistPanel({ blacklists }: BlacklistPanelProps) {
       await addBlacklist({ variables: { input: { word: newWord.trim() } } });
       toast.success('Kata ditambahkan');
       setNewWord('');
-    } catch (err: any) {
-      toast.error(err.message || 'Gagal menambah');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     }
   };
 
@@ -32,8 +39,8 @@ export function BlacklistPanel({ blacklists }: BlacklistPanelProps) {
     try {
       await removeBlacklist({ variables: { id } });
       toast.success('Kata dihapus');
-    } catch (err: any) {
-      toast.error(err.message || 'Gagal menghapus');
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err));
     }
   };
 

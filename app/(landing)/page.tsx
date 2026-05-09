@@ -1,8 +1,8 @@
 import { AnalyticFeature } from '@/features/landing/components/AnalyticFeature';
-import { ContentLibraryFeature } from '@/features/landing/components/ContentLibraryFeature';
 import { HeroSection } from '@/features/landing/components/HeroSection';
+import { InsightFeature } from '@/features/landing/components/InsightFeature';
+import { RecommendationFeature } from '@/features/landing/components/RecommendationFeature';
 import { SchedulingFeature } from '@/features/landing/components/SchedulingFeature';
-import { UnifiedInboxFeature } from '@/features/landing/components/UnifiedInboxFeature';
 
 export default function LandingPage() {
   return (
@@ -14,11 +14,11 @@ export default function LandingPage() {
       <SchedulingFeature
         id="schedule-feature"
       />
-      <ContentLibraryFeature
-        id="content-library-feature"
+      <InsightFeature
+        id="insight-feature"
       />
-      <UnifiedInboxFeature
-        id="inbox-feature"
+      <RecommendationFeature
+        id='recommendation-feature'
       />
       {/* Nanti tambahkan fitur-fitur di sini */}
     </main>

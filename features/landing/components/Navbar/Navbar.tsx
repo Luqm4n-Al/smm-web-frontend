@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import { NavbarDropdown } from './NavbarDropdown';
+import { Logo } from '@/shared/Logo';
 
 export function Navbar() {
   //State buka/tutup dropdown
@@ -34,8 +35,8 @@ export function Navbar() {
   const featureItems = [
     { label: 'Analytics Suite', href: 'analytic-feature' },
     { label: 'Visual Scheduler', href: 'schedule-feature' },
-    { label: 'Content Library', href: 'content-library-feature' },
-    { label: 'Unified Inbox', href: 'inbox-feature' },
+    { label: 'Insight', href: 'insight-feature' },
+    { label: 'Recommendation', href: 'recommendation-feature' },
   ]
 
   //return untuk UI component
@@ -45,10 +46,7 @@ export function Navbar() {
       {/* Navbar section */}
       <nav className="container mx-auto flex h-16 items-center justify-between px-4 md:px-6">
         {/* Icon Aplikasi / Logo */}
-        <Link href="/" className="flex items-center gap-2 text-xl font-bold">
-          <span className="text-2xl">🚀</span>
-          <span className='text-blue-600'>Social Vista</span>
-        </Link>
+        <Logo variant='full' size={60} priority/>
 
         {/* Menu Tengah */}
         <div className="hidden items-center gap-6 md:flex">

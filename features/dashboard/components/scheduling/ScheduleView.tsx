@@ -40,7 +40,7 @@ export function ScheduleView() {
         <div className="lg:col-span-1">
           <PlanningList
             schedules={schedules}
-            onRefresh={refetch}
+            onRefresh={async ()=> {await refetch(); }}
           />
         </div>
       </div>

@@ -1,3 +1,4 @@
+//app/(dashboard)/dashboard/recommendation/page.tsx
 import { AIRecommendationCard } from "@/features/dashboard/components/recommendation/AIRecommendationCard";
 import { BestTimeWidget } from "@/features/dashboard/components/recommendation/BestTimeWidget";
 import { HashtagCloud } from "@/features/dashboard/components/recommendation/HashtagCloud";
