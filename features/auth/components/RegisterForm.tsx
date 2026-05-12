@@ -8,7 +8,6 @@ import { FcGoogle } from 'react-icons/fc';
 import { useRegisterMutation } from '../graphql/register.mutation'; // sesuaikan path
 import toast from 'react-hot-toast';
 import { FiArrowLeft } from 'react-icons/fi';
-import { signOut } from 'next-auth/react';
 
 export function RegisterForm() {
   const router = useRouter();

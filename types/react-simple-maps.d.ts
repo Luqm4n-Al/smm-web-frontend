@@ -8,11 +8,6 @@
 // type bawaan yang lengkap, maka kita membuat
 // deklarasi manual sendiri.
 //
-// Dengan file ini:
-// ✅ Autocomplete menjadi lebih baik
-// ✅ Error TypeScript berkurang
-// ✅ Struktur props lebih jelas
-// ✅ Developer lebih mudah memahami component
 //
 
 // Membuat deklarasi module untuk react-simple-maps
@@ -102,16 +97,13 @@ declare module 'react-simple-maps' {
   export interface GeoGeometry {
 
     // Tipe geometry
-    // Contoh:
-    // Polygon
-    // MultiPolygon
     type: string;
 
     // Key unik geography
     rsmKey: string;
 
     // Property tambahan
-    // Biasanya berisi nama negara dll
+    // Berisi nama negara dll
     properties?: Record<string, unknown>;
 
     // Property bebas lainnya

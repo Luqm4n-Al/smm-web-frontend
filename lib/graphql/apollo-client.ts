@@ -78,7 +78,7 @@ if (typeof window !== 'undefined') {
     },
 
     retryAttempts: 5,
-    keepalive: 10_000, // Keep-alive every 10 seconds
+    keepAlive: 10_000, // Keep-alive every 10 seconds
     
     // ✅ IMPROVED: Exponential backoff untuk reconnection
     on: {
