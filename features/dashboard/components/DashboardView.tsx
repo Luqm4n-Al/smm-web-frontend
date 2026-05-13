@@ -2,7 +2,8 @@
 'use client';
 
 import { useState } from 'react';
-import { PlatformSwitcher } from './PlatfromSwitcher';
+import { PlatformSwitcher } from './PlatformSwitcher';
+import { DataErrorFallback } from './DataErrorFallback';
 import { useGetAnalyticsQuery } from '../graphql/analytics.query';
 import { useAnalyticsSubscription } from '../graphql/analytics.subscription';
 import { StatGrid } from './stats/StatGrid';
@@ -11,23 +12,28 @@ import { GrowthLineChart } from './charts/GrowthLineChart';
 export function DashboardView() {
   const [platform, setPlatform] = useState<'all' | 'instagram' | 'tiktok'>('all');
 
-  // HTTP Query untuk initial load
-  const { data: queryData, loading: analyticsLoading, error: analyticsError } = useGetAnalyticsQuery();
+  // 🆕 Ambil refetch dari query
+  const {
+    data: queryData,
+    loading: analyticsLoading,
+    error: analyticsError,
+    refetch,
+  } = useGetAnalyticsQuery();
 
-  // WebSocket Subscription untuk real-time updates ⭐ NEW
+  // WebSocket Subscription untuk real-time updates
   const { liveData } = useAnalyticsSubscription();
 
   // Prioritize subscription data > query data
   const effectiveAnalytics = liveData || queryData?.analytics;
   const growth = effectiveAnalytics?.growthMatrix;
 
-  // Filter stats berdasarkan platform + prioritize live data
+  // Filter stats berdasarkan platform
   const getFilteredStats = () => {
     if (!effectiveAnalytics?.socialMedia) return null;
-    
+
     const instagram = effectiveAnalytics.socialMedia.instagram;
     const tiktok = effectiveAnalytics.socialMedia.tiktok;
-    
+
     if (platform === 'instagram') {
       return {
         followers: instagram.followers,
@@ -36,7 +42,7 @@ export function DashboardView() {
         sentiments: instagram.sentiments,
       };
     }
-    
+
     if (platform === 'tiktok') {
       return {
         followers: tiktok.followers,
@@ -45,7 +51,7 @@ export function DashboardView() {
         sentiments: tiktok.sentiments,
       };
     }
-    
+
     // All (aggregate)
     return {
       followers: instagram.followers + tiktok.followers,
@@ -70,33 +76,55 @@ export function DashboardView() {
   }> = [];
 
   if (growth) {
-    const dateSet = new Set<string>();
-    growth.followers?.forEach(f => dateSet.add(f.date));
-    growth.likes?.forEach(l => dateSet.add(l.date));
-    growth.views?.forEach(v => dateSet.add(v.date));
+    // Pre-build Map untuk O(1) lookup per tanggal (menghindari O(n²) dari Array.find)
+    const followerMap = new Map(growth.followers?.map(f => [f.date, f.quantity]) ?? []);
+    const likeMap = new Map(growth.likes?.map(l => [l.date, l.quantity]) ?? []);
+    const viewMap = new Map(growth.views?.map(v => [v.date, v.quantity]) ?? []);
+
+    // Kumpulkan semua tanggal unik
+    const dateSet = new Set<string>([
+      ...(growth.followers?.map(f => f.date) ?? []),
+      ...(growth.likes?.map(l => l.date) ?? []),
+      ...(growth.views?.map(v => v.date) ?? []),
+    ]);
 
     dateSet.forEach(date => {
-      const followerEntry = growth.followers?.find(f => f.date === date);
-      const likeEntry = growth.likes?.find(l => l.date === date);
-      const viewEntry = growth.views?.find(v => v.date === date);
-
       mergedGrowthData.push({
         date,
-        followers: followerEntry?.quantity,
-        likes: likeEntry?.quantity,
-        views: viewEntry?.quantity,
+        followers: followerMap.get(date),
+        likes: likeMap.get(date),
+        views: viewMap.get(date),
       });
     });
 
     mergedGrowthData.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
   }
 
-  const loading = analyticsLoading; // Prioritize analytics loading (query + subscription)
+  const loading = analyticsLoading;
   const error = analyticsError;
 
-  if (loading) return <div className="flex justify-center py-20 text-gray-500">Memuat dashboard...</div>;
-  if (error) return <div className="flex justify-center py-20 text-red-500">Error: {error.message}</div>;
+  // 🟡 Loading state
+  if (loading)
+    return (
+      <div className="flex justify-center py-20 text-gray-500">
+        Memuat dashboard...
+      </div>
+    );
 
+  // 🔴 Error state – sekarang menggunakan DataErrorFallback
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <DataErrorFallback
+          error={error}
+          title="Gagal memuat data dashboard"
+          onRetry={() => refetch?.()} // ✅ aman dengan optional chaining
+        />
+      </div>
+    );
+  }
+
+  // 🟢 Data tersedia
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

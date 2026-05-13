@@ -1,53 +1,53 @@
+// features/dashboard/hooks/usePlatformData.ts
 import { useGetAnalyticsQuery } from '../graphql/analytics.query';
 
 export const usePlatformData = (platform: 'all' | 'instagram' | 'tiktok') => {
-  const { data, loading, error } = useGetAnalyticsQuery();
-
+  const { data, loading, error, refetch } = useGetAnalyticsQuery();
   const analytics = data?.analytics;
-  if (!analytics) return { stats: null, loading, error };
 
-  const instagram = analytics.socialMedia.instagram;
-  const tiktok = analytics.socialMedia.tiktok;
+  // Default safe values
+  const emptySentiment = { positive: 0, neutral: 0, negative: 0 };
+  const emptyStats = {
+    followers: 0,
+    totalViews: 0,
+    totalLikes: 0,
+    sentiments: emptySentiment,
+  };
+
+  if (!analytics) return { stats: null, loading, error, refetch };
+
+  const instagram = analytics.socialMedia?.instagram || emptyStats;
+  const tiktok = analytics.socialMedia?.tiktok || emptyStats;
+
+  const safeInstagram = {
+    ...instagram,
+    sentiments: instagram.sentiments || emptySentiment,
+  };
+  const safeTiktok = {
+    ...tiktok,
+    sentiments: tiktok.sentiments || emptySentiment,
+  };
 
   if (platform === 'instagram') {
-    return {
-      stats: {
-        followers: instagram.followers,
-        totalViews: instagram.totalViews,
-        totalLikes: instagram.totalLikes,
-        sentiments: instagram.sentiments,
-      },
-      loading,
-      error,
-    };
+    return { stats: safeInstagram, loading, error, refetch };
   }
-
   if (platform === 'tiktok') {
-    return {
-      stats: {
-        followers: tiktok.followers,
-        totalViews: tiktok.totalViews,
-        totalLikes: tiktok.totalLikes,
-        sentiments: tiktok.sentiments,
-      },
-      loading,
-      error,
-    };
+    return { stats: safeTiktok, loading, error, refetch };
   }
-
-  // Semua (agregat)
+  // all
   return {
     stats: {
-      followers: instagram.followers + tiktok.followers,
-      totalViews: instagram.totalViews + tiktok.totalViews,
-      totalLikes: instagram.totalLikes + tiktok.totalLikes,
+      followers: safeInstagram.followers + safeTiktok.followers,
+      totalViews: safeInstagram.totalViews + safeTiktok.totalViews,
+      totalLikes: safeInstagram.totalLikes + safeTiktok.totalLikes,
       sentiments: {
-        positive: instagram.sentiments.positive + tiktok.sentiments.positive,
-        neutral: instagram.sentiments.neutral + tiktok.sentiments.neutral,
-        negative: instagram.sentiments.negative + tiktok.sentiments.negative,
+        positive: safeInstagram.sentiments.positive + safeTiktok.sentiments.positive,
+        neutral: safeInstagram.sentiments.neutral + safeTiktok.sentiments.neutral,
+        negative: safeInstagram.sentiments.negative + safeTiktok.sentiments.negative,
       },
     },
     loading,
     error,
+    refetch,
   };
 };

@@ -2,7 +2,8 @@
 'use client';
 
 import { useState } from 'react'; // 🆕 useEffect
-import { PlatformSwitcher } from '../PlatfromSwitcher';
+import { PlatformSwitcher } from '../PlatformSwitcher';
+import { DataErrorFallback } from '../DataErrorFallback';
 import { usePlatformData } from '../../hooks/usePlatformData';
 import { useGetAnalyticsQuery } from '../../graphql/analytics.query';
 import { useAnalyticsSubscription } from '../../graphql/analytics.subscription';
@@ -14,7 +15,7 @@ import { GeoMap } from './GeoMap';
 export function AnalyticsView() {
   const [platform, setPlatform] = useState<'all' | 'instagram' | 'tiktok'>('all');
 
-  const { stats, loading: statsLoading, error: statsError } = usePlatformData(platform);
+  const { stats, loading: statsLoading, error: statsError, refetch } = usePlatformData(platform);
   const { data: queryData, loading, error } = useGetAnalyticsQuery();
   const { liveData } = useAnalyticsSubscription();
 
@@ -30,7 +31,17 @@ export function AnalyticsView() {
   const activeError = !liveData ? (statsError || error) : null;
 
   if (isLoading) return <div className="flex justify-center py-20 text-gray-500">Memuat analytics...</div>;
-  if (activeError) return <div className="flex justify-center py-20 text-red-500">Error: {activeError.message}</div>;
+  if (activeError) {
+    return (
+      <div className='space-y-6'>
+        <DataErrorFallback
+          error={activeError}
+          title='Gagal memuat data analytics'
+          onRetry={() => refetch?.()}
+        />
+      </div>
+    )
+  }
   if (!effectiveAnalytics) return null;
 
   return (

@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { PlatformSwitcher } from '../PlatfromSwitcher';
+import { PlatformSwitcher } from '../PlatformSwitcher';
 import { useGetPostsQuery } from '../../graphql/posts.query';
 import { useGetCommentBlackListsQuery } from '../../graphql/commentBlacklists.query';
 import { InsightCard } from './InsightCard';

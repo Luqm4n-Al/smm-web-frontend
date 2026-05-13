@@ -12,31 +12,50 @@ import {
 } from 'recharts';
 import { ReactNode } from 'react';
 
-//Dummy data untuk sentiment harian
-const data = [
-  { day: 'Mon', positive: 65, neutral: 20, negative: 15 },
-  { day: 'Tue', positive: 68, neutral: 18, negative: 14 },
-  { day: 'Wed', positive: 70, neutral: 15, negative: 15 },
-  { day: 'Thu', positive: 67, neutral: 20, negative: 13 },
-  { day: 'Fri', positive: 72, neutral: 16, negative: 12 },
-  { day: 'Sat', positive: 75, neutral: 15, negative: 10 },
-  { day: 'Sun', positive: 70, neutral: 18, negative: 12 },
-];
+interface SentimentTrendChartProps {
+  positive: number;
+  neutral: number;
+  negative: number;
+}
 
 //formatter untuk membuat format persentase
 const formatter = (value: unknown): ReactNode => {
   return `${value}%`;
 };
 
-export function SentimentTrendChart() {
+export function SentimentTrendChart({ positive, neutral, negative }: SentimentTrendChartProps) {
+  const total = positive + neutral + negative;
+
+  // Hitung persentase dari data real
+  const positivePercent = total > 0 ? Math.round((positive / total) * 100) : 0;
+  const neutralPercent = total > 0 ? Math.round((neutral / total) * 100) : 0;
+  const negativePercent = total > 0 ? Math.round((negative / total) * 100) : 0;
+
+  // Data untuk chart — distribusi sentiment berdasarkan data real API
+  const data = [
+    { label: 'Sentiment', positive: positivePercent, neutral: neutralPercent, negative: negativePercent },
+  ];
+
+  // Jika tidak ada data sama sekali
+  if (total === 0) {
+    return (
+      <div>
+        <h3 className="mb-2 text-sm font-medium text-gray-700">Sentiment distribution</h3>
+        <div className="flex h-40 items-center justify-center text-sm text-gray-400">
+          Belum ada data sentimen
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <h3 className="mb-2 text-sm font-medium text-gray-700">Sentiment trend</h3>
+      <h3 className="mb-2 text-sm font-medium text-gray-700">Sentiment distribution</h3>
       <div className="h-40 w-full">
         {/* Recharts container untuk grafik */}
         <ResponsiveContainer width="100%" height="100%">
           <AreaChart data={data} margin={{ top: 5, right: 0, left: -20, bottom: 0 }}>
-            <XAxis dataKey="day" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+            <XAxis dataKey="label" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
             <YAxis hide />
             <Tooltip
               contentStyle={{ fontSize: 12, borderRadius: 8 }}
@@ -69,15 +88,15 @@ export function SentimentTrendChart() {
       <div className="mt-2 flex justify-center gap-4 text-xs">
         <div className="flex items-center gap-1">
           <span className="h-2 w-2 rounded-full bg-green-500"></span>
-          <span>Positive</span>
+          <span>Positive ({positivePercent}%)</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="h-2 w-2 rounded-full bg-gray-400"></span>
-          <span>Neutral</span>
+          <span>Neutral ({neutralPercent}%)</span>
         </div>
         <div className="flex items-center gap-1">
           <span className="h-2 w-2 rounded-full bg-red-500"></span>
-          <span>Negative</span>
+          <span>Negative ({negativePercent}%)</span>
         </div>
       </div>
     </div>

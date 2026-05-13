@@ -6,8 +6,7 @@ import { dummyContents } from '@/lib/dummyDataInsight';
 
 export function ContentGrid() {
   const handleCardClick = (id: string) => {
-    // Nanti buka modal detail
-    console.log('Klik konten:', id);
+    // TODO: Implementasi modal detail konten
   };
 
   return (

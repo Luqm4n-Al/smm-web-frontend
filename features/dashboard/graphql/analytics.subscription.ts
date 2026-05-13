@@ -104,21 +104,6 @@ export const useAnalyticsSubscription = () => {
     ANALYTICS_UPDATED_SUBSCRIPTION
   );
 
-  // Log error untuk debugging
-  if (error && process.env.NODE_ENV === 'development') {
-    console.error('❌ [Analytics Subscription] Error:', {
-      message: error.message,
-      networkStatus: (error as any).networkStatus,
-      extraInfo: (error as any).extraInfo,
-      graphQLErrors: (error as any).graphQLErrors,
-    });
-  }
-
-  // Log successful connection
-  if (data && !loading) {
-    console.log('✅ [Analytics Subscription] Data received successfully');
-  }
-
   // Return data in standard format for components
   return {
     liveData: data?.analyticsUpdated,
