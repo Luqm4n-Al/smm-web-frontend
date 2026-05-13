@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import { FiX, FiCalendar, FiEdit } from 'react-icons/fi';
 import { useCreateSchedule } from '../../graphql/create-schedule.mutation';
 import { useUpdateSchedule } from '../../graphql/update-schedule.mutation';
@@ -34,6 +34,13 @@ export function CreatePlanModal({ isOpen, onClose, onSuccess, existingPlan }: Pr
   const defaultSchedule = existingPlan?.scheduledUpload || '';
 
   if (!isOpen) return null;
+
+  // Keyboard: Escape untuk menutup modal
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape' && !loading) {
+      onClose();
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,7 +76,6 @@ export function CreatePlanModal({ isOpen, onClose, onSuccess, existingPlan }: Pr
         toast.success('Plan berhasil dibuat');
       }
       onSuccess();
-      onClose();
     } catch (err: unknown) {
       toast.error(extractErrorMessage(err));
     }
@@ -78,8 +84,14 @@ export function CreatePlanModal({ isOpen, onClose, onSuccess, existingPlan }: Pr
   return (
     <>
       <div className="fixed inset-0 z-40 bg-black/20" onClick={onClose} />
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="w-full max-w-md rounded-lg bg-white shadow-xl">
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+        onKeyDown={handleKeyDown}
+      >
+        <div
+          key={existingPlan?.id ?? 'new'}
+          className="w-full max-w-md rounded-lg bg-white shadow-xl"
+        >
           <div className="flex items-center justify-between border-b px-5 py-3">
             <h3 className="text-lg font-semibold">
               {isEditMode ? 'Edit Planning' : 'Buat Planning'}

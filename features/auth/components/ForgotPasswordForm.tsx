@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { FiMail, FiPhone, FiArrowLeft } from 'react-icons/fi';
 import { useForgotPasswordMutation } from '../graphql/forgot-password.mutation';
 import toast from 'react-hot-toast';
+import { extractErrorMessage } from '@/lib/error-utils';
 
 export function ForgotPasswordForm() {
   const router = useRouter();
@@ -22,8 +23,8 @@ export function ForgotPasswordForm() {
         toast.success('Kode OTP telah dikirim ke email Anda.');
         router.push(`/forgot-password/verify?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`);
       }
-    } catch (err: any) {
-      toast.error(err.message || 'Gagal mengirim OTP');
+    } catch (err: unknown) {
+      toast.error(extractErrorMessage(err));
     }
   };
 

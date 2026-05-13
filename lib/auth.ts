@@ -60,11 +60,9 @@ export const authOptions: NextAuthOptions = {
       /**
        * Fungsi authorize
        * 
-       * Dipanggil saat user login
-       * Bertugas:
-       * - Mengirim request ke backend (GraphQL)
-       * - Mengambil access_token & refresh_token
-       * - Mengembalikan data user jika login berhasil
+       * Mendukung 2 mode login:
+       * 1. Regular: username + password → mutation login
+       * 2. Firebase: firebaseIdToken + '__firebase__' → mutation firebaseLogin
        */
       async authorize(credentials) {
         // Validasi input
@@ -72,41 +70,61 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        // Request ke GraphQL endpoint (mutation login)
+        const isFirebaseLogin = credentials.password === '__firebase__';
+
+        // Pilih query berdasarkan mode login
+        const query = isFirebaseLogin
+          ? `
+            mutation FirebaseLogin($input: String!) {
+              firebaseLogin(input: $input) {
+                access_token
+                refresh_token
+              }
+            }
+          `
+          : `
+            mutation Login($input: LoginInput!) {
+              login(input: $input) {
+                access_token
+                refresh_token
+              }
+            }
+          `;
+
+        const variables = isFirebaseLogin
+          ? { input: credentials.username } // username berisi Firebase ID token
+          : { input: { username: credentials.username, password: credentials.password } };
+
+        // Request ke GraphQL endpoint
         const res = await fetch(process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-
-          body: JSON.stringify({
-            query: `
-              mutation Login($input: LoginInput!) {
-                login(input: $input) {
-                  access_token
-                  refresh_token
-                }
-              }
-            `,
-            variables: {
-              input: {
-                username: credentials.username,
-                password: credentials.password,
-              },
-            },
-          }),
+          body: JSON.stringify({ query, variables }),
         });
 
-        const { data } = await res.json();
+        // Cek HTTP response status
+        if (!res.ok) {
+          return null;
+        }
 
-        // Jika login berhasil, kembalikan object user + token
-        if (data?.login) {
+        const { data, errors } = await res.json();
+
+        // Cek GraphQL errors
+        if (errors?.length) {
+          return null;
+        }
+
+        // Extract token dari response (firebaseLogin atau login)
+        const loginData = isFirebaseLogin ? data?.firebaseLogin : data?.login;
+
+        if (loginData) {
           return {
-            id: credentials.username,
-            accessToken: data.login.access_token,
-            refreshToken: data.login.refresh_token,
+            id: isFirebaseLogin ? 'firebase-user' : credentials.username,
+            accessToken: loginData.access_token,
+            refreshToken: loginData.refresh_token,
           };
         }
 
-        // Jika gagal, return null → login dianggap gagal
         return null;
       },
     }),

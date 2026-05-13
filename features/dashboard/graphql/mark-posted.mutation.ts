@@ -1,4 +1,4 @@
-// features/scheduling/graphql/mark-posted.mutation.ts
+// features/dashboard/graphql/mark-posted.mutation.ts
 import { gql } from '@apollo/client';
 import { useMutation } from '@apollo/client/react';
 import type { ContentSchedule } from './schedule.types';

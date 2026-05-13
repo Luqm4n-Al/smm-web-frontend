@@ -29,9 +29,9 @@ interface CustomCalendarProps {
   onSelectDate?: (date: Date) => void;
 }
 
-export function CustomCalendar({ events, onSelectDate }: CustomCalendarProps) {
+export function CustomCalendar({ events, selectedDate: selectedDateProp, onSelectDate }: CustomCalendarProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(selectedDateProp ?? null);
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(monthStart);
@@ -40,7 +40,8 @@ export function CustomCalendar({ events, onSelectDate }: CustomCalendarProps) {
 
   const days = eachDayOfInterval({ start: startDate, end: endDate });
 
-  const weekDays = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab']; // Bisa disesuaikan
+  // Urutan dimulai dari Senin sesuai weekStartsOn: 1
+  const weekDays = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
 
   const handleDateClick = (day: Date) => {
     setSelectedDate(day);

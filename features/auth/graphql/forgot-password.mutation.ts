@@ -1,6 +1,11 @@
 import { gql} from '@apollo/client';
 import { useMutation } from '@apollo/client/react';
 
+interface ForgotPasswordInput {
+  email: string;
+  phone: string;
+}
+
 export const FORGOT_PASSWORD_MUTATION = gql`
   mutation ForgotPassword($input: ForgotPasswordInput!) {
     forgotPassword(input: $input) {
@@ -11,5 +16,8 @@ export const FORGOT_PASSWORD_MUTATION = gql`
 `;
 
 export const useForgotPasswordMutation = () => {
-  return useMutation<{ forgotPassword: { email: string; phone: string } }, { input: { email: string; phone: string } }>(FORGOT_PASSWORD_MUTATION);
+  return useMutation<
+    { forgotPassword: { email: string; phone: string } },
+    { input: ForgotPasswordInput }
+  >(FORGOT_PASSWORD_MUTATION);
 };

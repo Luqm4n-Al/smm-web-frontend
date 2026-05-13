@@ -1,5 +1,6 @@
 import { gql } from '@apollo/client';
 import { useMutation } from '@apollo/client/react';
+import type { OTPInput } from './auth.types';
 
 export const VERIFY_FORGOT_OTP_MUTATION = gql`
   mutation VerifyOTPForgotPassword($input: OTPInput!) {
@@ -8,5 +9,8 @@ export const VERIFY_FORGOT_OTP_MUTATION = gql`
 `;
 
 export const useVerifyForgotOtpMutation = () => {
-  return useMutation<{ verifyOTPForgotPassword: string }, { input: { email: string; phone: string; otp: string } }>(VERIFY_FORGOT_OTP_MUTATION);
+  return useMutation<
+    { verifyOTPForgotPassword: string },
+    { input: OTPInput }
+  >(VERIFY_FORGOT_OTP_MUTATION);
 };

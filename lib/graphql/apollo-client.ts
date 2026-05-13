@@ -1,4 +1,4 @@
-// lib/apolloClient.js
+// lib/graphql/apollo-client.ts
 
 import {
   ApolloClient,
@@ -50,11 +50,12 @@ if (typeof window !== 'undefined') {
   const wsEndpoint = process.env.NEXT_PUBLIC_WS_ENDPOINT;
 
   if (!wsEndpoint) {
-    throw new Error(
+    console.warn(
       '[Apollo] NEXT_PUBLIC_WS_ENDPOINT is not defined. ' +
+      'WebSocket subscriptions will not work. ' +
       'Please check your .env.local file.'
-    )
-  }
+    );
+  } else {
 
   // Helper untuk exponential backoff retry
   let retryCount = 0;
@@ -68,14 +69,8 @@ if (typeof window !== 'undefined') {
   wsClient = createClient({
     url: wsEndpoint,
 
-    // Auto reconnect dengan exponential backoff
-    shouldRetry: (count) => {
-      if (count > 5) {
-        console.warn('⚠️  [WS] Max retry attempts (5) reached. Stopping reconnection.');
-        return false;
-      }
-      return true;
-    },
+    // Auto reconnect — retryAttempts sudah membatasi jumlah retry
+    shouldRetry: () => true,
 
     retryAttempts: 5,
     keepAlive: 10_000, // Keep-alive every 10 seconds
@@ -91,22 +86,28 @@ if (typeof window !== 'undefined') {
       connected: () => {
         retryCount = 0; // Reset retry counter on successful connection
         sessionStorage.removeItem('ws_error_logged');
-        console.log('✅ [WS] Connected!');
+        if (process.env.NODE_ENV === 'development') {
+          console.log('✅ [WS] Connected!');
+        }
       },
 
       closed: () => {
-        console.warn('⚠️  [WS] Connection closed');
+        if (process.env.NODE_ENV === 'development') {
+          console.warn('⚠️  [WS] Connection closed');
+        }
       },
 
       error: (error) => {
-        const errorKey = 'ws_error_logged';
-        if (!sessionStorage.getItem(errorKey)) {
-          const delay = getRetryDelay();
-          console.warn(
-            `⚠️  [WS] Connection failed (retry in ${delay}ms). Endpoint: ${process.env.NEXT_PUBLIC_WS_ENDPOINT}`,
-            error ?? '(no details)'
-          );
-          sessionStorage.setItem(errorKey, 'true');
+        if (process.env.NODE_ENV === 'development') {
+          const errorKey = 'ws_error_logged';
+          if (!sessionStorage.getItem(errorKey)) {
+            const delay = getRetryDelay();
+            console.warn(
+              `⚠️  [WS] Connection failed (retry in ${delay}ms). Endpoint: ${process.env.NEXT_PUBLIC_WS_ENDPOINT}`,
+              error ?? '(no details)'
+            );
+            sessionStorage.setItem(errorKey, 'true');
+          }
         }
       },
     },
@@ -119,6 +120,7 @@ if (typeof window !== 'undefined') {
       };
     },
   });
+  }
 }
 
 // ─────────────────────────────────────────────
@@ -162,9 +164,10 @@ export async function closeApolloWebSocket() {
 
   try {
     await wsClient.dispose();
-    console.log('✅ [WS] WebSocket closed');
   } catch (error) {
-    console.error('❌ [WS] Error closing WebSocket:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('❌ [WS] Error closing WebSocket:', error);
+    }
   }
 }
 
@@ -175,32 +178,9 @@ export async function closeApolloWebSocket() {
 export async function resetApolloCache() {
   try {
     await apolloClient.clearStore();
-    console.log('✅ Apollo cache cleared');
   } catch (error) {
-    console.error('❌ Error clearing Apollo cache:', error);
+    if (process.env.NODE_ENV === 'development') {
+      console.error('❌ Error clearing Apollo cache:', error);
+    }
   }
-}
-
-// ─────────────────────────────────────────────
-// WebSocket Diagnostic Helper
-// ─────────────────────────────────────────────
-export function diagnosisWebSocketStatus() {
-  if (typeof window === 'undefined') {
-    console.log('⚠️  Server-side: WebSocket diagnosis tidak tersedia');
-    return;
-  }
-
-  const endpoint = process.env.NEXT_PUBLIC_WS_ENDPOINT;
-  const token = localStorage.getItem('token');
-
-  console.group('🔍 WebSocket Diagnostic Info');
-  console.log('📍 Endpoint  :', endpoint ?? '(not configured)');
-  console.log('🔐 Token     :', token ? '✅ Present' : '❌ Missing');
-  console.log('🌐 WS Client :', wsClient ? 'graphql-ws (active)' : 'N/A');
-  console.log('💡 Jika gagal, cek:');
-  console.log('   1. Apakah backend running di:', endpoint);
-  console.log('   2. Apakah .env.local sudah dikonfigurasi?');
-  console.log('   3. Network / firewall?');
-  console.log('   4. CORS settings di backend?');
-  console.groupEnd();
 }

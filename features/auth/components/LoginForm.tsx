@@ -6,6 +6,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, Suspense } from 'react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
 import { FcGoogle } from 'react-icons/fc';
+import { signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from '@/lib/firebase';
+import toast from 'react-hot-toast';
 
 interface LoginFormProps {
     isFirstLogin?: boolean;
@@ -50,6 +53,36 @@ function LoginFormContent({ isFirstLogin: isFirstLoginProp = false }: LoginFormP
                 // Regular login, go to dashboard
                 router.push('/dashboard');
             }
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        setIsLoading(true);
+        setError('');
+        try {
+            // 1. Firebase Google popup → ambil ID token
+            const result = await signInWithPopup(auth, googleProvider);
+            const idToken = await result.user.getIdToken();
+
+            // 2. Sign in via NextAuth — authorize akan memanggil firebaseLogin mutation
+            //    username = Firebase ID token, password = '__firebase__' (flag)
+            const res = await signIn('credentials', {
+                username: idToken,
+                password: '__firebase__',
+                redirect: false,
+            });
+
+            if (res?.ok) {
+                router.push('/dashboard');
+            } else {
+                setError('Gagal login dengan Google. Silakan coba lagi.');
+            }
+        } catch (err: unknown) {
+            const message = err instanceof Error ? err.message : 'Gagal login dengan Google';
+            setError(message);
+            toast.error(message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -158,7 +191,9 @@ function LoginFormContent({ isFirstLogin: isFirstLoginProp = false }: LoginFormP
                 {/* Masuk dengan Google */}
                 <button
                     type="button"
-                    className="flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50"
+                    onClick={handleGoogleLogin}
+                    disabled={isLoading}
+                    className="flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <FcGoogle className="h-5 w-5" />
                     Masuk dengan Google

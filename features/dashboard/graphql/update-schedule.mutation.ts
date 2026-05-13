@@ -1,4 +1,4 @@
-// features/scheduling/graphql/update-schedule.mutation.ts
+// features/dashboard/graphql/update-schedule.mutation.ts
 import { gql } from '@apollo/client';
 import { useMutation } from '@apollo/client/react';
 import type { ContentSchedule, UpdateContentScheduleInput } from './schedule.types';

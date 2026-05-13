@@ -29,26 +29,12 @@ export function TokenManager() {
       const token = session?.user?.accessToken;
       
       if (status === 'authenticated' && token) {
-        // Debug: log token tersimpan
-        console.log('✅ [TokenManager] Saving token to localStorage');
         localStorage.setItem('token', token);
-        
-        // Verify
-        const saved = localStorage.getItem('token');
-        if (saved === token) {
-          console.log('✅ [TokenManager] Token verified: OK');
-        } else {
-          console.error('❌ [TokenManager] Token verification failed');
-        }
       } else if (status === 'unauthenticated') {
-        // Token tidak ada atau user logged out, clear localStorage
-        console.log('🗑️ [TokenManager] Clearing token from localStorage (unauthenticated)');
         localStorage.removeItem('token');
-      } else if (status === 'authenticated' && !token) {
-        console.warn('⚠️ [TokenManager] Authenticated but no token in session yet');
       }
     } catch (error) {
-      console.error('❌ [TokenManager] Error managing token:', error);
+      // Silent fail — localStorage mungkin tidak tersedia
     }
   }, [status, session?.user?.accessToken]);
 

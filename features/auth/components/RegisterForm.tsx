@@ -1,17 +1,21 @@
-// src/features/auth/components/RegisterForm.tsx
 'use client';
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FcGoogle } from 'react-icons/fc';
-import { useRegisterMutation } from '../graphql/register.mutation'; // sesuaikan path
+import { useRegisterMutation } from '../graphql/register.mutation';
 import toast from 'react-hot-toast';
 import { FiArrowLeft } from 'react-icons/fi';
+import { extractErrorMessage } from '@/lib/error-utils';
+import { signInWithPopup } from 'firebase/auth';
+import { auth, googleProvider } from '@/lib/firebase';
+import { signIn } from 'next-auth/react';
 
 export function RegisterForm() {
   const router = useRouter();
   const [registerMutation, { loading }] = useRegisterMutation();
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -42,10 +46,35 @@ export function RegisterForm() {
         // Arahkan ke halaman verifikasi OTP, bawa email sebagai query param
         router.push(`/verify-otp?email=${encodeURIComponent(formData.email)}&phone=${encodeURIComponent(formData.phone)}&username=${encodeURIComponent(formData.username)}`);
       }
-    } catch (err: any) {
-      // Tampilkan pesan error dari GraphQL
-      const message = err?.message || 'Terjadi kesalahan saat registrasi';
-      toast.error(message);
+    } catch (err: unknown) {
+      toast.error(extractErrorMessage(err));
+    }
+  };
+
+  const handleGoogleRegister = async () => {
+    setIsGoogleLoading(true);
+    try {
+      // 1. Firebase Google popup → ambil ID token
+      const result = await signInWithPopup(auth, googleProvider);
+      const idToken = await result.user.getIdToken();
+
+      // 2. Sign in via NextAuth — authorize akan memanggil firebaseLogin mutation
+      const res = await signIn('credentials', {
+        username: idToken,
+        password: '__firebase__',
+        redirect: false,
+      });
+
+      if (res?.ok) {
+        toast.success('Berhasil mendaftar dengan Google!');
+        router.push('/dashboard');
+      } else {
+        toast.error('Gagal mendaftar dengan Google. Silakan coba lagi.');
+      }
+    } catch (err: unknown) {
+      toast.error(extractErrorMessage(err));
+    } finally {
+      setIsGoogleLoading(false);
     }
   };
 
@@ -145,11 +174,12 @@ export function RegisterForm() {
         {/* Daftar dengan Google */}
         <button
           type="button"
-          disabled={loading}
-          className="flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-50"
+          onClick={handleGoogleRegister}
+          disabled={loading || isGoogleLoading}
+          className="flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <FcGoogle className="h-5 w-5" />
-          Daftar dengan Google
+          {isGoogleLoading ? 'Menghubungkan...' : 'Daftar dengan Google'}
         </button>
       </form>
     </div>

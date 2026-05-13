@@ -4,7 +4,9 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useVerifyForgotOtpMutation } from '../graphql/verify-forgot-otp.mutation';
 import toast from 'react-hot-toast';
+import { extractErrorMessage } from '@/lib/error-utils';
 import { FiArrowLeft } from 'react-icons/fi';
+import { formatCountdownTime } from '@/lib/format-utils';
 
 function ForgotOtpVerificationFormContent() {
   const router = useRouter();
@@ -42,16 +44,12 @@ function ForgotOtpVerificationFormContent() {
         toast.success('OTP berhasil diverifikasi');
         router.push(`/forgot-password/reset?token=${data.verifyOTPForgotPassword}`);
       }
-    } catch (err: any) {
-      toast.error(err.message || 'OTP tidak valid');
+    } catch (err: unknown) {
+      toast.error(extractErrorMessage(err));
     }
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  };
+
 
   return (
     <div className="w-full max-w-md">
@@ -75,7 +73,7 @@ function ForgotOtpVerificationFormContent() {
           {timer === 0 ? (
             <button type="button" onClick={() => { /* nanti bisa resend khusus */ }} className="text-sm font-medium text-blue-600 hover:text-blue-500">Kirim Ulang Kode</button>
           ) : (
-            <p className="text-sm text-gray-500">Kirim Ulang kode : {formatTime(timer)}</p>
+            <p className="text-sm text-gray-500">Kirim Ulang kode : {formatCountdownTime(timer)}</p>
           )}
         </div>
         <button type="submit" disabled={loading} className="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-50">

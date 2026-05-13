@@ -1,6 +1,6 @@
 import { gql } from "@apollo/client";
 import { useMutation } from "@apollo/client/react";
-import type { RegisterInput } from "./auth.types";
+import type { RegisterInput, UserRegister } from "./auth.types";
 
 export const REGISTER_MUTATION = gql`
     mutation Register($input: RegisterInput!) {
@@ -13,9 +13,6 @@ export const REGISTER_MUTATION = gql`
 `;
 
 export const useRegisterMutation = () => {
-    return useMutation<{ register: {
-        email: string; 
-        username: string; 
-        phone: string } }, 
+    return useMutation<{ register: UserRegister }, 
     { input: RegisterInput }>(REGISTER_MUTATION);
 }

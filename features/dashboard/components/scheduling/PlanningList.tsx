@@ -1,10 +1,11 @@
-// features/scheduling/components/PlanningList.tsx
+// features/dashboard/components/scheduling/PlanningList.tsx
 'use client';
 
 import { useState } from 'react';
-import { FiPlus, FiEdit, FiCheck } from 'react-icons/fi';
+import { FiPlus, FiEdit, FiCheck, FiTrash2 } from 'react-icons/fi';
 import { CreatePlanModal } from './CreatePlanModal';
 import { useMarkAsPosted } from '../../graphql/mark-posted.mutation';
+import { useDeleteSchedule } from '../../graphql/delete-schedule.mutation';
 import type { ContentSchedule } from '../../graphql/schedule.types';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/error-utils';
@@ -22,12 +23,26 @@ export function PlanningList({ schedules = [], onRefresh }: PlanningListProps) {
     scheduledUpload?: string;
   } | null>(null);
   const [markAsPosted] = useMarkAsPosted();
+  const [deleteSchedule] = useDeleteSchedule();
 
   const handleMarkAsPosted = async (id: string) => {
     try {
       await markAsPosted({ variables: { id } });
       toast.success('Status diubah menjadi Dipublikasi');
-      onRefresh();
+      await onRefresh();
+    } catch (err: unknown) {
+      toast.error(extractErrorMessage(err));
+    }
+  };
+
+  const handleDelete = async (id: string, title: string) => {
+    const confirmed = window.confirm(`Hapus plan "${title}"?`);
+    if (!confirmed) return;
+
+    try {
+      await deleteSchedule({ variables: { id } });
+      toast.success('Plan berhasil dihapus');
+      await onRefresh();
     } catch (err: unknown) {
       toast.error(extractErrorMessage(err));
     }
@@ -83,6 +98,13 @@ export function PlanningList({ schedules = [], onRefresh }: PlanningListProps) {
                       >
                         <FiCheck className="h-4 w-4" />
                       </button>
+                      <button
+                        onClick={() => handleDelete(s.id, s.title)}
+                        className="ml-2 text-red-500 hover:text-red-700"
+                        title="Hapus plan"
+                      >
+                        <FiTrash2 className="h-4 w-4" />
+                      </button>
                     </>
                   )}
                 </div>
@@ -95,7 +117,7 @@ export function PlanningList({ schedules = [], onRefresh }: PlanningListProps) {
       <CreatePlanModal
         isOpen={isModalOpen || editingPlan !== null}
         onClose={() => { setIsModalOpen(false); setEditingPlan(null); }}
-        onSuccess={() => { setIsModalOpen(false); setEditingPlan(null); onRefresh(); }}
+        onSuccess={async () => { setIsModalOpen(false); setEditingPlan(null); await onRefresh(); }}
         existingPlan={editingPlan}
       />
     </>

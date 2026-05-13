@@ -1,4 +1,4 @@
-// src/features/auth/components/AuthPreview.tsx
+// features/auth/components/AuthPreview.tsx
 interface AuthPreviewProps {
   variant?: 'login' | 'register';
 }

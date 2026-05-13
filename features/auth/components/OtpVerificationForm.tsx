@@ -7,6 +7,7 @@ import { useResendOtpMutation } from '../graphql/resend-otp.mutation'; //import
 import toast from 'react-hot-toast';
 import { FiArrowLeft } from 'react-icons/fi';
 import { apolloClient } from '@/lib/graphql/apollo-client';
+import { formatCountdownTime } from '@/lib/format-utils';
 
 interface OtpVerificationFormProps {
   email: string;
@@ -64,13 +65,6 @@ export function OtpVerificationForm({ email, phone, username }: OtpVerificationF
       return;
     }
 
-    console.log('🔍 DEBUG: Starting OTP verification', {
-      email,
-      phone,
-      otp,
-      otpLength: otp.length,
-      timestamp: new Date().toISOString(),
-    });
 
     try {
       const { data } = await verifyOtp({
@@ -83,7 +77,6 @@ export function OtpVerificationForm({ email, phone, username }: OtpVerificationF
         },
       });
 
-        console.log('📊 DEBUG: VerifyOTP Response', data?.verifyOTP)
 
       // Karena server mengembalikan string (contoh token), kita anggap sukses jika ada nilainya
         if (data?.verifyOTP) {
@@ -95,19 +88,11 @@ export function OtpVerificationForm({ email, phone, username }: OtpVerificationF
         }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Kode OTP salah atau kedaluwarsa';
-      console.error('❌ DEBUG: OTP Verification Error', {
-        errorMessage,
-        errorStack: err instanceof Error ? err.stack : undefined,
-      });
       toast.error(errorMessage);
     }
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  };
+
 
     const handleBack = async () => {
         await apolloClient.resetStore();
@@ -171,7 +156,7 @@ export function OtpVerificationForm({ email, phone, username }: OtpVerificationF
               {resending ? 'Mengirim...' : 'Kirim Ulang Kode'}
             </button>
           ) : (
-            <p className="text-sm text-gray-500">Kirim Ulang kode : {formatTime(timer)}</p>
+            <p className="text-sm text-gray-500">Kirim Ulang kode : {formatCountdownTime(timer)}</p>
           )}
         </div>
 

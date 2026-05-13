@@ -1,4 +1,4 @@
-// src/features/auth/components/ChangePasswordForm.tsx
+// features/auth/components/ChangePasswordForm.tsx
 'use client';
 
 import { useState } from 'react';
@@ -7,6 +7,7 @@ import { signOut } from 'next-auth/react';
 import { FiEye, FiEyeOff, FiLock, FiArrowLeft } from 'react-icons/fi';
 import { useChangePasswordMutation } from '../graphql/change-password.mutation';
 import toast from 'react-hot-toast';
+import { extractErrorMessage } from '@/lib/error-utils';
 
 export function ChangePasswordForm() {
   const router = useRouter();
@@ -63,8 +64,8 @@ export function ChangePasswordForm() {
         // Redirect ke login dengan flag bahwa password sudah diubah
         router.push('/login?passwordChanged=true');
       }
-    } catch (err: any) {
-      toast.error(err?.message || 'Gagal mengubah password');
+    } catch (err: unknown) {
+      toast.error(extractErrorMessage(err));
     }
   };
 
@@ -193,7 +194,7 @@ export function ChangePasswordForm() {
           disabled={loading}
           className="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Mengganti Password...' : 'Masuk'}
+          {loading ? 'Mengganti Password...' : 'Ganti Password'}
         </button>
       </form>
     </div>
