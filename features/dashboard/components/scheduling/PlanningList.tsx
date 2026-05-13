@@ -7,12 +7,7 @@ import { CreatePlanModal } from './CreatePlanModal';
 import { useMarkAsPosted } from '../../graphql/mark-posted.mutation';
 import type { ContentSchedule } from '../../graphql/schedule.types';
 import toast from 'react-hot-toast';
-
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  if (typeof error === 'string') return error;
-  return 'Terjadi kesalahan';
-}
+import { extractErrorMessage } from '@/lib/error-utils';
 
 interface PlanningListProps {
   schedules?: ContentSchedule[];
@@ -34,7 +29,7 @@ export function PlanningList({ schedules = [], onRefresh }: PlanningListProps) {
       toast.success('Status diubah menjadi Dipublikasi');
       onRefresh();
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err));
+      toast.error(extractErrorMessage(err));
     }
   };
 

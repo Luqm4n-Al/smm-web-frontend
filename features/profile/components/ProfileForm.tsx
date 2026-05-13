@@ -14,13 +14,7 @@ import { useChangeAvatarMutation } from '../graphql/change-avatar.mutation';
 import { useChangePhoneMutation } from '../graphql/change-phone.mutation';
 import { useChangeSocialAccountMutation } from '../graphql/change-social-account.mutation';
 import type { SocialAccountInput, SocialAccount } from '../graphql/profile.types';
-
-// Helper bebas any
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  if (typeof error === 'string') return error;
-  return 'Terjadi kesalahan';
-}
+import { extractErrorMessage } from '@/lib/error-utils';
 
 export function ProfileForm() {
   const router = useRouter();
@@ -69,7 +63,7 @@ export function ProfileForm() {
         toast.success('Avatar berhasil diubah');
       }
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err));
+      toast.error(extractErrorMessage(err));
     }
   };
 
@@ -99,7 +93,7 @@ export function ProfileForm() {
         toast.success('Akun media sosial diperbarui');
       }
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err));
+      toast.error(extractErrorMessage(err));
     }
   };
 

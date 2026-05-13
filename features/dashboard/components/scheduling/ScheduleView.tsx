@@ -4,13 +4,14 @@ import { useState } from 'react';
 import { useGetContentSchedules } from '../../graphql/content-schedules.query';
 import { CustomCalendar } from './CustomCalendar';
 import { PlanningList } from './PlanningList';
+import { DataErrorFallback } from '../DataErrorFallback';
 
 export function ScheduleView() {
   const { data, loading, error, refetch } = useGetContentSchedules();
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
   if (loading) return <div className="flex justify-center py-10 text-gray-500">Memuat jadwal...</div>;
-  if (error) return <div className="flex justify-center py-10 text-red-500">Error: {error.message}</div>;
+  if (error) return <DataErrorFallback error={error} title="Gagal Memuat Jadwal" onRetry={refetch} />;
 
   const schedules = data?.contentSchedules || [];
 

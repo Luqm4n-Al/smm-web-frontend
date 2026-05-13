@@ -7,16 +7,10 @@ import { useAddBlacklistMutation } from '../../graphql/add-blacklist.mutation';
 import { useRemoveBlacklistMutation } from '../../graphql/remove-blacklist.mutation';
 import type { CommentBlackList } from '../../graphql/insight.types';
 import toast from 'react-hot-toast';
+import { extractErrorMessage } from '@/lib/error-utils';
 
 interface BlacklistPanelProps {
   blacklists: CommentBlackList[];
-}
-
-// Helper mengambil pesan error dari berbagai tipe
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  if (typeof error === 'string') return error;
-  return 'Terjadi kesalahan';
 }
 
 export function BlacklistPanel({ blacklists }: BlacklistPanelProps) {
@@ -31,7 +25,7 @@ export function BlacklistPanel({ blacklists }: BlacklistPanelProps) {
       toast.success('Kata ditambahkan');
       setNewWord('');
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err));
+      toast.error(extractErrorMessage(err));
     }
   };
 
@@ -40,7 +34,7 @@ export function BlacklistPanel({ blacklists }: BlacklistPanelProps) {
       await removeBlacklist({ variables: { id } });
       toast.success('Kata dihapus');
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err));
+      toast.error(extractErrorMessage(err));
     }
   };
 

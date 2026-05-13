@@ -5,6 +5,7 @@ import { FiX, FiCalendar, FiEdit } from 'react-icons/fi';
 import { useCreateSchedule } from '../../graphql/create-schedule.mutation';
 import { useUpdateSchedule } from '../../graphql/update-schedule.mutation';
 import toast from 'react-hot-toast';
+import { extractErrorMessage } from '@/lib/error-utils';
 
 interface PlanData {
   id?: string;
@@ -18,12 +19,6 @@ interface Props {
   onClose: () => void;
   onSuccess: () => void;
   existingPlan?: PlanData | null;
-}
-
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  if (typeof error === 'string') return error;
-  return 'Gagal memproses permintaan';
 }
 
 export function CreatePlanModal({ isOpen, onClose, onSuccess, existingPlan }: Props) {
@@ -76,7 +71,7 @@ export function CreatePlanModal({ isOpen, onClose, onSuccess, existingPlan }: Pr
       onSuccess();
       onClose();
     } catch (err: unknown) {
-      toast.error(getErrorMessage(err));
+      toast.error(extractErrorMessage(err));
     }
   };
 

@@ -1,6 +1,7 @@
 // features/scheduling/graphql/mark-posted.mutation.ts
 import { gql } from '@apollo/client';
 import { useMutation } from '@apollo/client/react';
+import type { ContentSchedule } from './schedule.types';
 
 export const MARK_POSTED_MUTATION = gql`
   mutation MarkContentScheduleAsPosted($id: ID!) {
@@ -12,5 +13,8 @@ export const MARK_POSTED_MUTATION = gql`
 `;
 
 export const useMarkAsPosted = () => {
-  return useMutation(MARK_POSTED_MUTATION);
+  return useMutation<
+    { markContentScheduleAsPosted: ContentSchedule },
+    { id: string }
+  >(MARK_POSTED_MUTATION);
 };
