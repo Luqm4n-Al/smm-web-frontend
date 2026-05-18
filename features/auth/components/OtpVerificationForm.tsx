@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useVerifyOtpMutation } from '../graphql/verify-otp.mutation';
-import { useResendOtpMutation } from '../graphql/resend-otp.mutation'; //import
+import { useResendOtpMutation } from '../graphql/resend-otp.mutation';
 import toast from 'react-hot-toast';
 import { FiArrowLeft } from 'react-icons/fi';
 import { apolloClient } from '@/lib/graphql/apollo-client';
@@ -18,7 +18,7 @@ interface OtpVerificationFormProps {
 export function OtpVerificationForm({ email, phone, username }: OtpVerificationFormProps) {
   const router = useRouter();
   const [verifyOtp, { loading: verifying }] = useVerifyOtpMutation();
-  const [resendOtp, { loading: resending }] = useResendOtpMutation(); // 🆕
+  const [resendOtp, { loading: resending }] = useResendOtpMutation();
 
   const [otp, setOtp] = useState('');
   const [timer, setTimer] = useState(60);
@@ -49,19 +49,18 @@ export function OtpVerificationForm({ email, phone, username }: OtpVerificationF
           },
         },
       });
-      toast.success('Kode OTP baru telah dikirim ke email Anda.');
+      toast.success('A new OTP code has been sent to your email.');
       setTimer(60); // reset timer setelah sukses
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Gagal mengirim ulang OTP. Coba lagi nanti.';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to resend OTP. Please try again later.';
       toast.error(errorMessage);
-      // biarkan timer tetap 0 agar user bisa mencoba lagi
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.length !== 6) {
-      toast.error('Mohon masukkan 6 digit kode OTP');
+      toast.error('Please enter the 6-digit OTP code');
       return;
     }
 
@@ -80,14 +79,14 @@ export function OtpVerificationForm({ email, phone, username }: OtpVerificationF
 
       // Karena server mengembalikan string (contoh token), kita anggap sukses jika ada nilainya
         if (data?.verifyOTP) {
-            toast.success('Verifikasi berhasil! Silakan cek email untuk password sementara.');
+            toast.success('Verification successful! Please check your email for a temporary password.');
             router.push('/login?welcome=true');
         } else {
             // Jika server mengembalikan null/undefined berarti gagal
-            toast.error('OTP tidak valid');
+            toast.error('Invalid OTP code');
         }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Kode OTP salah atau kedaluwarsa';
+      const errorMessage = err instanceof Error ? err.message : 'Invalid or expired OTP code';
       toast.error(errorMessage);
     }
   };
@@ -108,12 +107,12 @@ export function OtpVerificationForm({ email, phone, username }: OtpVerificationF
             className='mb-6 flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600'
         >
             <FiArrowLeft className='h-4 w-4'/>
-            Kembali ke Register
+            Back to Register
         </button>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Verifikasi OTP</h1>
-        <p className="mt-2 text-sm text-gray-600">Masukkan kode OTP yang dikirim via email</p>
+        <h1 className="text-3xl font-bold text-gray-900">OTP Verification</h1>
+        <p className="mt-2 text-sm text-gray-600">Enter the OTP code sent to your email</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -129,7 +128,7 @@ export function OtpVerificationForm({ email, phone, username }: OtpVerificationF
         </div>
 
         <div>
-          <label htmlFor="otp" className="block text-sm font-medium text-gray-700">Kode OTP</label>
+          <label htmlFor="otp" className="block text-sm font-medium text-gray-700">OTP Code</label>
           <input
             ref={inputRef}
             id="otp"
@@ -153,10 +152,10 @@ export function OtpVerificationForm({ email, phone, username }: OtpVerificationF
               disabled={resending}
               className="text-sm font-medium text-blue-600 hover:text-blue-500 disabled:text-blue-400 disabled:cursor-not-allowed"
             >
-              {resending ? 'Mengirim...' : 'Kirim Ulang Kode'}
+              {resending ? 'Sending...' : 'Resend Code'}
             </button>
           ) : (
-            <p className="text-sm text-gray-500">Kirim Ulang kode : {formatCountdownTime(timer)}</p>
+            <p className="text-sm text-gray-500">Resend code in {formatCountdownTime(timer)}</p>
           )}
         </div>
 
@@ -165,7 +164,7 @@ export function OtpVerificationForm({ email, phone, username }: OtpVerificationF
           disabled={verifying}
           className="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {verifying ? 'Memverifikasi...' : 'Verifikasi'}
+          {verifying ? 'Verifying...' : 'Verify'}
         </button>
       </form>
     </div>

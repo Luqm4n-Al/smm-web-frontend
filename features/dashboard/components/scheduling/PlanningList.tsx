@@ -28,7 +28,7 @@ export function PlanningList({ schedules = [], onRefresh }: PlanningListProps) {
   const handleMarkAsPosted = async (id: string) => {
     try {
       await markAsPosted({ variables: { id } });
-      toast.success('Status diubah menjadi Dipublikasi');
+      toast.success('Status changed to Published');
       await onRefresh();
     } catch (err: unknown) {
       toast.error(extractErrorMessage(err));
@@ -36,12 +36,12 @@ export function PlanningList({ schedules = [], onRefresh }: PlanningListProps) {
   };
 
   const handleDelete = async (id: string, title: string) => {
-    const confirmed = window.confirm(`Hapus plan "${title}"?`);
+    const confirmed = window.confirm(`Delete plan "${title}"?`);
     if (!confirmed) return;
 
     try {
       await deleteSchedule({ variables: { id } });
-      toast.success('Plan berhasil dihapus');
+      toast.success('Plan deleted successfully');
       await onRefresh();
     } catch (err: unknown) {
       toast.error(extractErrorMessage(err));
@@ -54,25 +54,25 @@ export function PlanningList({ schedules = [], onRefresh }: PlanningListProps) {
     <>
       <div className="rounded-lg border bg-white p-4 shadow-sm">
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-lg font-medium text-gray-900">List Planning</h3>
+          <h3 className="text-lg font-medium text-gray-900">Planning List</h3>
           <button
             onClick={() => setIsModalOpen(true)}
             className="flex items-center gap-1 rounded-md bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700"
           >
             <FiPlus className="h-4 w-4" />
-            Tambah Plan
+            Add Plan
           </button>
         </div>
         <div className="space-y-2 max-h-[500px] overflow-y-auto">
           {schedules.length === 0 ? (
-            <p className="text-center text-sm text-gray-500 py-4">Belum ada rencana.</p>
+            <p className="text-center text-sm text-gray-500 py-4">No plans yet.</p>
           ) : (
             schedules.map(s => (
               <div key={s.id} className="flex items-center justify-between rounded-lg border p-3">
                 <div className="flex-1">
                   <p className="font-medium text-sm">{s.title}</p>
                   <p className="text-xs text-gray-500">
-                    {s.scheduledUpload ? new Date(s.scheduledUpload).toLocaleDateString('id-ID') : '-'}
+                    {s.scheduledUpload ? new Date(s.scheduledUpload).toLocaleDateString('en-US') : '-'}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -94,14 +94,14 @@ export function PlanningList({ schedules = [], onRefresh }: PlanningListProps) {
                       <button
                         onClick={() => handleMarkAsPosted(s.id)}
                         className="ml-2 text-green-600 hover:text-green-800"
-                        title="Tandai selesai"
+                        title="Mark as posted"
                       >
                         <FiCheck className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(s.id, s.title)}
                         className="ml-2 text-red-500 hover:text-red-700"
-                        title="Hapus plan"
+                        title="Delete plan"
                       >
                         <FiTrash2 className="h-4 w-4" />
                       </button>

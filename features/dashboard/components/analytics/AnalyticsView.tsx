@@ -11,6 +11,8 @@ import { SentimentSection } from './SentimentSection';
 import { AgePieChart } from './AgePieChart';
 import { GenderChart } from './GenderChart';
 import { GeoMap } from './GeoMap';
+import { SearchableSection } from '../SearchableSection';
+import { NoSearchResults } from '../NoSearchResults';
 
 export function AnalyticsView() {
   const [platform, setPlatform] = useState<'all' | 'instagram' | 'tiktok'>('all');
@@ -30,13 +32,13 @@ export function AnalyticsView() {
   const isLoading = (statsLoading || loading) && !liveData;
   const activeError = !liveData ? (statsError || error) : null;
 
-  if (isLoading) return <div className="flex justify-center py-20 text-gray-500">Memuat analytics...</div>;
+  if (isLoading) return <div className="flex justify-center py-20 text-gray-500">Loading analytics...</div>;
   if (activeError) {
     return (
       <div className='space-y-6'>
         <DataErrorFallback
           error={activeError}
-          title='Gagal memuat data analytics'
+          title='Failed to load analytics data'
           onRetry={() => refetch?.()}
         />
       </div>
@@ -49,26 +51,36 @@ export function AnalyticsView() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Analytics</h1>
-          <p className="text-gray-600">Analisis sentimen dan demografi audiens.</p>
+          <p className="text-gray-600">Sentiment analysis and audience demographics.</p>
           {liveData && (
-            <span className="text-xs text-green-600">● Live update aktif</span>
+            <span className="text-xs text-green-600">● Live update active</span>
           )}
         </div>
         <PlatformSwitcher selected={platform} onChange={setPlatform} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <SentimentSection
-          positive={sentiments.positive}
-          neutral={sentiments.neutral}
-          negative={sentiments.negative}
-        />
+        <SearchableSection title="Sentiment Analysis">
+          <SentimentSection
+            positive={sentiments.positive}
+            neutral={sentiments.neutral}
+            negative={sentiments.negative}
+          />
+        </SearchableSection>
         <div className="space-y-6">
-          <AgePieChart data={effectiveAnalytics.ageRange} />
-          <GenderChart data={effectiveAnalytics.genderAudience} />
+          <SearchableSection title="Audience Age">
+            <AgePieChart data={effectiveAnalytics.ageRange} />
+          </SearchableSection>
+          <SearchableSection title="Gender">
+            <GenderChart data={effectiveAnalytics.genderAudience} />
+          </SearchableSection>
         </div>
       </div>
-      <GeoMap data={countryHeatmap} />
+      <SearchableSection title="Audience Location">
+        <GeoMap data={countryHeatmap} />
+      </SearchableSection>
+
+      <NoSearchResults />
     </div>
   );
 }

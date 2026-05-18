@@ -42,7 +42,7 @@ export function RegisterForm() {
       });
 
       if (data?.register) {
-        toast.success('Registrasi berhasil! Silakan cek email untuk kode OTP.');
+        toast.success('Registration successful! Please check your email for the OTP code.');
         // Arahkan ke halaman verifikasi OTP, bawa email sebagai query param
         router.push(`/verify-otp?email=${encodeURIComponent(formData.email)}&phone=${encodeURIComponent(formData.phone)}&username=${encodeURIComponent(formData.username)}`);
       }
@@ -66,10 +66,10 @@ export function RegisterForm() {
       });
 
       if (res?.ok) {
-        toast.success('Berhasil mendaftar dengan Google!');
+        toast.success('Successfully registered with Google!');
         router.push('/dashboard');
       } else {
-        toast.error('Gagal mendaftar dengan Google. Silakan coba lagi.');
+        toast.error('Failed to register with Google. Please try again.');
       }
     } catch (err: unknown) {
       toast.error(extractErrorMessage(err));
@@ -78,21 +78,20 @@ export function RegisterForm() {
     }
   };
 
-  // ... kode JSX tidak berubah, hanya tambahkan disabled pada button saat loading
   return (
     <div className="w-full max-w-md">
       {/* Back-Button */}
       <Link href="/" className='mb-6 flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600'>
         <FiArrowLeft className='h-4 w-4'/>
-        Kembali ke Beranda
+        Back to Home
       </Link>
       {/* Header Form */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Create account</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Create Account</h1>
         <p className="mt-2 text-sm text-gray-600">
-          Sudah punya akun?{' '}
+          Already have an account?{' '}
           <Link href="/login" className="font-medium text-blue-600 hover:text-blue-500">
-            Masuk sekarang
+            Sign in
           </Link>
         </p>
       </div>
@@ -110,7 +109,7 @@ export function RegisterForm() {
             value={formData.username}
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border border-gray-300 px-4 py-3 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            placeholder="Masukkan username"
+            placeholder="Enter your username"
             required
             disabled={loading}
           />
@@ -127,16 +126,16 @@ export function RegisterForm() {
             value={formData.email}
             onChange={handleChange}
             className="mt-1 block w-full rounded-md border border-gray-300 px-4 py-3 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            placeholder="contoh@email.com"
+            placeholder="example@email.com"
             required
             disabled={loading}
           />
         </div>
 
-        {/* No. HP */}
+        {/* Phone */}
         <div>
           <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
-            No. HP
+            Phone Number
           </label>
           <input
             id="phone"
@@ -152,13 +151,13 @@ export function RegisterForm() {
 
 
 
-        {/* Tombol Daftar */}
+        {/* Register Button */}
         <button
           type="submit"
           disabled={loading}
           className="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Mendaftarkan...' : 'Daftar'}
+          {loading ? 'Registering...' : 'Register'}
         </button>
 
         {/* Divider */}
@@ -167,11 +166,11 @@ export function RegisterForm() {
             <div className="w-full border-t border-gray-300" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="bg-white px-2 text-gray-500">atau</span>
+            <span className="bg-white px-2 text-gray-500">or</span>
           </div>
         </div>
 
-        {/* Daftar dengan Google */}
+        {/* Register with Google */}
         <button
           type="button"
           onClick={handleGoogleRegister}
@@ -179,7 +178,7 @@ export function RegisterForm() {
           className="flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <FcGoogle className="h-5 w-5" />
-          {isGoogleLoading ? 'Menghubungkan...' : 'Daftar dengan Google'}
+          {isGoogleLoading ? 'Connecting...' : 'Register with Google'}
         </button>
       </form>
     </div>

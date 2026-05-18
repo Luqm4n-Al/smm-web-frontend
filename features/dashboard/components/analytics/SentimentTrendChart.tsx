@@ -42,7 +42,7 @@ export function SentimentTrendChart({ positive, neutral, negative }: SentimentTr
       <div>
         <h3 className="mb-2 text-sm font-medium text-gray-700">Sentiment distribution</h3>
         <div className="flex h-40 items-center justify-center text-sm text-gray-400">
-          Belum ada data sentimen
+          No data available
         </div>
       </div>
     );

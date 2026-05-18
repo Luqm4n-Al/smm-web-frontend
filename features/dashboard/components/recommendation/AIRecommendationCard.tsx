@@ -3,9 +3,9 @@
 import { FiCpu } from 'react-icons/fi';
 
 const recommendations = [
-  'Fokus pada konten video pendek (Reels/TikTok) karena engagement naik 42% minggu ini.',
-  'Gunakan tone santai dan humoris - analisis sentimen menunjukkan audiens merespon positif.',
-  'Posting pada hari Rabu dan Kamis pukul 16:00-18:00 untuk jangkauan maksimal.',
+  'Focus on short-form video content (Reels/TikTok) as engagement increased 42% this week.',
+  'Use a casual and humorous tone — sentiment analysis shows your audience responds positively.',
+  'Post on Wednesday and Thursday between 4:00 PM – 6:00 PM for maximum reach.',
 ];
 
 export function AIRecommendationCard() {
@@ -13,7 +13,7 @@ export function AIRecommendationCard() {
     <div className="rounded-lg border bg-linear-to-br from-blue-50 to-white p-6 shadow-sm">
       <div className="mb-4 flex items-center gap-2">
         <FiCpu className="h-5 w-5 text-blue-600" />
-        <h3 className="text-lg font-medium text-gray-900">Rekomendasi Cerdas</h3>
+        <h3 className="text-lg font-medium text-gray-900">Smart Recommendations</h3>
         <span className="ml-auto rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-800">AI</span>
       </div>
       <ul className="space-y-4">

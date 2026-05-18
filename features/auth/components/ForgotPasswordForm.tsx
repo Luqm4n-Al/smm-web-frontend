@@ -20,7 +20,7 @@ export function ForgotPasswordForm() {
         variables: { input: { email, phone } },
       });
       if (data?.forgotPassword) {
-        toast.success('Kode OTP telah dikirim ke email Anda.');
+        toast.success('OTP code has been sent to your email.');
         router.push(`/forgot-password/verify?email=${encodeURIComponent(email)}&phone=${encodeURIComponent(phone)}`);
       }
     } catch (err: unknown) {
@@ -35,13 +35,13 @@ export function ForgotPasswordForm() {
         onClick={() => router.push('/login')}
         className="mb-6 flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600"
       >
-        <FiArrowLeft className="h-4 w-4" /> Kembali ke Login
+        <FiArrowLeft className="h-4 w-4" /> Back to Sign In
       </button>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Lupa Password</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Forgot Password</h1>
         <p className="mt-2 text-sm text-gray-600">
-          Masukkan email dan nomor HP Anda untuk menerima kode OTP.
+          Enter your email and phone number to receive an OTP code.
         </p>
       </div>
 
@@ -50,18 +50,18 @@ export function ForgotPasswordForm() {
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
           <div className="relative mt-1">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><FiMail className="h-4 w-4" /></span>
-            <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} className="block w-full rounded-md border border-gray-300 py-2.5 pl-10 pr-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="contoh@email.com" required disabled={loading} />
+            <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} className="block w-full rounded-md border border-gray-300 py-2.5 pl-10 pr-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="example@email.com" required disabled={loading} />
           </div>
         </div>
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">No. HP</label>
+          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
           <div className="relative mt-1">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><FiPhone className="h-4 w-4" /></span>
             <input id="phone" type="tel" value={phone} onChange={e => setPhone(e.target.value)} className="block w-full rounded-md border border-gray-300 py-2.5 pl-10 pr-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="0812-3456-7890" required disabled={loading} />
           </div>
         </div>
         <button type="submit" disabled={loading} className="w-full rounded-md bg-blue-600 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50">
-          {loading ? 'Mengirim OTP...' : 'Kirim OTP'}
+          {loading ? 'Sending OTP...' : 'Send OTP'}
         </button>
       </form>
     </div>

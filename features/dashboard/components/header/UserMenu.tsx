@@ -10,7 +10,7 @@ export function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = () => {
-    toast.success('Anda telah logout');
+    toast.success('You have been logged out');
     signOut({ callbackUrl: '/' });
   };
 
@@ -29,7 +29,7 @@ export function UserMenu() {
             className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
           >
             <FiUser className="h-4 w-4" />
-            Profil Saya
+            My Profile
           </Link>
           <button
             onClick={handleLogout}

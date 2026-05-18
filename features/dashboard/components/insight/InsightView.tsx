@@ -7,6 +7,8 @@ import { useGetPostsQuery } from '../../graphql/posts.query';
 import { useGetCommentBlackListsQuery } from '../../graphql/commentBlacklists.query';
 import { InsightCard } from './InsightCard';
 import { BlacklistPanel } from './BlacklistPanel';
+import { SearchableSection } from '../SearchableSection';
+import { NoSearchResults } from '../NoSearchResults';
 
 const PAGE_SIZE = 12;
 
@@ -30,7 +32,7 @@ export function InsightView() {
   const { data: postsData, loading, error } = useGetPostsQuery(filter);
   const { data: blacklistData } = useGetCommentBlackListsQuery();
 
-  if (loading) return <div className="flex justify-center py-20 text-gray-500">Memuat insight...</div>;
+  if (loading) return <div className="flex justify-center py-20 text-gray-500">Loading insights...</div>;
   if (error) return <div className="flex justify-center py-20 text-red-500">Error: {error.message}</div>;
 
   const allPosts = postsData?.posts || [];
@@ -43,8 +45,8 @@ export function InsightView() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Insight Konten</h1>
-          <p className="text-gray-600">Analisis performa dan sentimen setiap konten.</p>
+          <h1 className="text-2xl font-bold text-gray-900">Content Insight</h1>
+          <p className="text-gray-600">Analyze performance and sentiment for each post.</p>
         </div>
         <div className="flex items-center gap-4">
           <PlatformSwitcher selected={platform} onChange={setPlatform} />
@@ -53,10 +55,10 @@ export function InsightView() {
             onChange={(e) => setSortField(e.target.value as SortField)}
             className="rounded-md border border-gray-300 px-3 py-1.5 text-sm"
           >
-            <option value="DATE">Tanggal</option>
+            <option value="DATE">Date</option>
             <option value="LIKE">Like</option>
             <option value="VIEW">View</option>
-            <option value="SENTIMENT">Sentimen</option>
+            <option value="SENTIMENT">Sentiment</option>
           </select>
           <button
             onClick={() => setSortOrder(prev => prev === 'ASC' ? 'DESC' : 'ASC')}
@@ -69,9 +71,9 @@ export function InsightView() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">
-        <div className="flex-1">
+        <SearchableSection title="Content Posts" className="flex-1">
           {posts.length === 0 ? (
-            <div className="text-center py-20 text-gray-500">Belum ada konten.</div>
+            <div className="text-center py-20 text-gray-500">No content yet.</div>
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -82,7 +84,7 @@ export function InsightView() {
 
               <div className="mt-6 flex items-center justify-between border-t pt-4">
                 <p className="text-sm text-gray-600">
-                  Halaman {page + 1}
+                  Page {page + 1}
                 </p>
                 <div className="flex gap-2">
                   <button
@@ -103,11 +105,13 @@ export function InsightView() {
               </div>
             </>
           )}
-        </div>
-        <div className="w-full lg:w-80">
+        </SearchableSection>
+        <SearchableSection title="Blacklist Keywords" className="w-full lg:w-80">
           <BlacklistPanel blacklists={blacklists} />
-        </div>
+        </SearchableSection>
       </div>
+
+      <NoSearchResults />
     </div>
   );
 }

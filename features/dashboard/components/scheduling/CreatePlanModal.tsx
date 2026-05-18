@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import { FiX, FiCalendar, FiEdit } from 'react-icons/fi';
 import { useCreateSchedule } from '../../graphql/create-schedule.mutation';
 import { useUpdateSchedule } from '../../graphql/update-schedule.mutation';
@@ -35,7 +35,7 @@ export function CreatePlanModal({ isOpen, onClose, onSuccess, existingPlan }: Pr
 
   if (!isOpen) return null;
 
-  // Keyboard: Escape untuk menutup modal
+  // Keyboard: Escape to close modal
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape' && !loading) {
       onClose();
@@ -48,7 +48,7 @@ export function CreatePlanModal({ isOpen, onClose, onSuccess, existingPlan }: Pr
     const scheduledUpload = scheduleRef.current?.value || '';
 
     if (!title) {
-      toast.error('Judul wajib diisi');
+      toast.error('Title is required');
       return;
     }
 
@@ -63,7 +63,7 @@ export function CreatePlanModal({ isOpen, onClose, onSuccess, existingPlan }: Pr
             },
           },
         });
-        toast.success('Plan berhasil diperbarui');
+        toast.success('Plan updated successfully');
       } else {
         await createSchedule({
           variables: {
@@ -73,7 +73,7 @@ export function CreatePlanModal({ isOpen, onClose, onSuccess, existingPlan }: Pr
             },
           },
         });
-        toast.success('Plan berhasil dibuat');
+        toast.success('Plan created successfully');
       }
       onSuccess();
     } catch (err: unknown) {
@@ -94,7 +94,7 @@ export function CreatePlanModal({ isOpen, onClose, onSuccess, existingPlan }: Pr
         >
           <div className="flex items-center justify-between border-b px-5 py-3">
             <h3 className="text-lg font-semibold">
-              {isEditMode ? 'Edit Planning' : 'Buat Planning'}
+              {isEditMode ? 'Edit Plan' : 'Create Plan'}
             </h3>
             <button onClick={onClose} className="rounded-full p-1 text-gray-400 hover:bg-gray-100">
               <FiX className="h-5 w-5" />
@@ -102,20 +102,20 @@ export function CreatePlanModal({ isOpen, onClose, onSuccess, existingPlan }: Pr
           </div>
           <form onSubmit={handleSubmit} className="space-y-4 px-5 py-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Nama Plan</label>
+              <label className="block text-sm font-medium text-gray-700">Plan Title</label>
               <div className="relative mt-1">
                 <FiEdit className="absolute left-3 top-2.5 text-gray-400 h-4 w-4" />
                 <input
                   ref={titleRef}
                   defaultValue={defaultTitle}
                   className="block w-full pl-10 rounded-md border border-gray-300 py-2.5 text-sm"
-                  placeholder="Masukkan nama plan"
+                  placeholder="Enter plan title"
                   disabled={loading}
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Tanggal Upload</label>
+              <label className="block text-sm font-medium text-gray-700">Upload Date</label>
               <div className="relative mt-1">
                 <FiCalendar className="absolute left-3 top-2.5 text-gray-400 h-4 w-4" />
                 <input
@@ -134,14 +134,14 @@ export function CreatePlanModal({ isOpen, onClose, onSuccess, existingPlan }: Pr
                 className="rounded-md border px-4 py-2 text-sm"
                 disabled={loading}
               >
-                Batal
+                Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
                 className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white disabled:opacity-50"
               >
-                {loading ? 'Menyimpan...' : 'Simpan'}
+                {loading ? 'Saving...' : 'Save'}
               </button>
             </div>
           </form>

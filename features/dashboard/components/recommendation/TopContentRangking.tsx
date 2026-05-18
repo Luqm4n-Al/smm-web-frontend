@@ -10,17 +10,17 @@ interface ContentRank {
 }
 
 const dummyRanks: ContentRank[] = [
-    {id: '1', title: 'Tips Karir Viral', engagement: 12400, platform: 'instagram'},
-    {id: '2', title: 'Tutotrial Produk', engagement: 11500, platform: 'instagram'},
+    {id: '1', title: 'Viral Career Tips', engagement: 12400, platform: 'instagram'},
+    {id: '2', title: 'Product Tutorial', engagement: 11500, platform: 'instagram'},
     {id: '3', title: 'Behind The Scene', engagement: 8500, platform: 'tiktok'},
 ]
 
-export function TopContentRangking() {
+export function TopContentRanking() {
     return (
         <div className="rounded-lg border bg-white p-6 shadow-sm">
             <div className="mb-4 flex items-center gap-2">
                 <FiTrendingUp className="h-5 w-5 text-blue-600"/>
-                <h3 className="text-lg font-medium text-gray-900">Rangking Konten</h3>
+                <h3 className="text-lg font-medium text-gray-900">Content Ranking</h3>
             </div>
             <div className="space-y-3">
                 {dummyRanks.map((item, index) => (
@@ -43,7 +43,7 @@ export function TopContentRangking() {
                         <p className="text-sm font-semibold text-gray-900">
                             {item.engagement.toLocaleString()}
                             <span className="text-xs font-normal text-gray-500">
-                                imp.
+                                {' '}engagements
                             </span>
                         </p>
                     </div>

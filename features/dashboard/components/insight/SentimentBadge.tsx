@@ -12,9 +12,9 @@ const styles = {
 };
 
 const labels = {
-    positive: 'Positif',
-    neutral: 'Netral',
-    negative: 'Negatif',
+    positive: 'Positive',
+    neutral: 'Neutral',
+    negative: 'Negative',
 }
 
 export function SentimentBadge({ sentiment, score }: SentimentBadgeProps) {

@@ -10,11 +10,11 @@ export function RecommendationFeature({ id }: FeatureSectionProps) {
         <div className="flex flex-col items-center gap-8 md:flex-row">
           <div className="flex-1">
             <h2 className="text-3xl font-bold text-gray-900">
-              Saran <span className="text-blue-600">Pintar</span> untuk Kamu
+              Smart <span className="text-blue-600">Recommendations</span> for You
             </h2>
             <p className="mt-4 text-lg text-gray-600">
-              Dapatkan rekomendasi waktu terbaik untuk posting, hashtag yang sedang tren, dan ide konten
-              berikutnya berdasarkan performa akunmu.
+              Get the best time to post, trending hashtags, and next content ideas
+              based on your account performance.
             </p>
           </div>
           <div className="flex-1">
@@ -25,17 +25,17 @@ export function RecommendationFeature({ id }: FeatureSectionProps) {
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">Best Time to Post</p>
-                  <p className="text-sm text-gray-500">Rabu & Kamis, 16:00 – 18:00</p>
+                  <p className="text-sm text-gray-500">Wed & Thu, 4:00 PM – 6:00 PM</p>
                 </div>
               </div>
               <div className="mt-3 space-y-2">
                 <div className="flex items-center gap-2">
                   <span className="text-green-500">🔹</span>
-                  <p className="text-sm text-gray-700">Gunakan hashtag <span className="font-medium">#TipsMarketing</span> – reach +35%</p>
+                  <p className="text-sm text-gray-700">Use hashtag <span className="font-medium">#MarketingTips</span> – reach +35%</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-green-500">🔹</span>
-                  <p className="text-sm text-gray-700">Konten video pendek lebih disukai minggu ini</p>
+                  <p className="text-sm text-gray-700">Short-form video content is trending this week</p>
                 </div>
               </div>
             </div>

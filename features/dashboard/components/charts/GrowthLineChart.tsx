@@ -46,7 +46,7 @@ export function GrowthLineChart({
           {title}
         </h3>
         <div className="flex h-64 w-full items-center justify-center rounded bg-gray-50">
-          <p className="text-gray-500">Belum ada data untuk ditampilkan</p>
+          <p className="text-gray-500">No data available</p>
         </div>
       </div>
     );

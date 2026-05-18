@@ -11,20 +11,20 @@ export function BestTimeWidget() {
             </div>
             <div className="text-center">
                 <p className="text-3xl font-bold text-gray-900">
-                    16:00 - 20:00
+                    4:00 PM - 8:00 PM
                 </p>
                 <p className="mt-1 text-sm text-gray-600">
-                    Waktu Indonesia Barat (WIB)
+                    Western Indonesia Time (WIB)
                 </p>
                 <div className="mt-4 flex justify-center gap-1">
-                    {['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'].map((day) => (
+                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
                         <div key={day} className="flex flex-col items-center">
                             <span className="text-xs text-gray-500">{day}</span>
-                            <div className={`mt-1 h-16 w-6 rounded-sm ${['Sel', 'Rab', 'Kam'].includes(day) ? 'bg-green-200' : 'bg-gray-100'}`}/>
+                            <div className={`mt-1 h-16 w-6 rounded-sm ${['Tue', 'Wed', 'Thu'].includes(day) ? 'bg-green-200' : 'bg-gray-100'}`}/>
                         </div>
                     ))}
                 </div>
-                <p className="mt-2 text-xs text-gray-500">Berdasarkan engagement 30 hari terakhir</p>
+                <p className="mt-2 text-xs text-gray-500">Based on engagement over the last 30 days</p>
             </div>
         </div>
     )

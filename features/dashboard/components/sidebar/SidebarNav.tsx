@@ -23,7 +23,7 @@ import {
  */
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: FiGrid },
-  { label: 'Analytic', href: '/dashboard/analytics', icon: FiBarChart2 },
+  { label: 'Analytics', href: '/dashboard/analytics', icon: FiBarChart2 },
   { label: 'Schedule', href: '/dashboard/schedule', icon: FiCalendar },
   { label: 'Insight', href: '/dashboard/insight', icon: FiCompass },
   { label: 'Recommendation', href: '/dashboard/recommendation', icon: HiThumbUp },

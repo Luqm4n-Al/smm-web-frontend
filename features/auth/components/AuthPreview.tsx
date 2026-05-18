@@ -6,30 +6,30 @@ interface AuthPreviewProps {
 export function AuthPreview({ variant = 'login' }: AuthPreviewProps) {
   const features = variant === 'register' 
     ? [
-        'Pantau pertumbuhan followers',
-        'Analisis sentimen otomatis',
-        'Jadwalkan konten mingguan',
-        'Rekomendasi hashtag cerdas',
+        'Track follower growth',
+        'Automatic sentiment analysis',
+        'Schedule weekly content',
+        'Smart hashtag recommendations',
       ]
     : [
-        'Dapatkan insight mendalam',
-        'Optimalkan strategi konten',
-        'Satu dashboard untuk semua',
+        'Get in-depth insights',
+        'Optimize your content strategy',
+        'One dashboard for everything',
       ];
 
   return (
     <div className="hidden lg:flex lg:flex-1 lg:flex-col lg:items-center lg:justify-center lg:bg-linear-to-br lg:from-blue-50 lg:to-blue-100 lg:p-12">
       <div className="max-w-md text-center">
         <h2 className="text-2xl font-bold text-gray-900">
-          {variant === 'register' ? 'Mulai Perjalanan Anda' : 'Pantau Performa Media Sosial Anda'}
+          {variant === 'register' ? 'Start Your Journey' : 'Monitor Your Social Media Performance'}
         </h2>
         <p className="mt-4 text-gray-600">
           {variant === 'register' 
-            ? 'Bergabunglah dengan ribuan kreator yang sudah menggunakan platform kami untuk mengembangkan bisnis.'
-            : 'Dapatkan insight mendalam, jadwalkan konten, dan optimalkan strategi sosial media Anda dalam satu dashboard.'
+            ? 'Join us and optimize your social media content strategy with powerful analytics and automation.'
+            : 'Get in-depth insights, schedule content, and optimize your social media strategy in one dashboard.'
           }
         </p>
-        {/* Fitur List */}
+        {/* Feature List */}
         <ul className="mt-8 space-y-3 text-left">
           {features.map((feature, idx) => (
             <li key={idx} className="flex items-center gap-3 text-sm text-gray-700">
@@ -41,7 +41,7 @@ export function AuthPreview({ variant = 'login' }: AuthPreviewProps) {
         {/* Placeholder preview */}
         <div className="mt-8 rounded-lg bg-white p-6 shadow-lg">
           <div className="flex items-center justify-between border-b pb-3">
-            <span className="text-sm font-medium text-gray-700">Statistik Akun</span>
+            <span className="text-sm font-medium text-gray-700">Account Statistics</span>
             <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs text-green-800">+12.5%</span>
           </div>
           <div className="mt-4 space-y-3">

@@ -20,14 +20,14 @@ function ResetPasswordFormContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 8) { toast.error('Minimal 8 karakter'); return; }
-    if (password !== confirmPassword) { toast.error('Password tidak cocok'); return; }
+    if (password.length < 8) { toast.error('Password must be at least 8 characters'); return; }
+    if (password !== confirmPassword) { toast.error('Passwords do not match'); return; }
     try {
       const { data } = await changePassword({
         variables: { input: { otp: token, password } },
       });
       if (data?.changeForgotenPassword) {
-        toast.success('Password berhasil diubah. Silakan login.');
+        toast.success('Password changed successfully. Please sign in.');
         router.push('/login');
       }
     } catch (err: unknown) {
@@ -38,12 +38,12 @@ function ResetPasswordFormContent() {
   return (
     <div className="w-full max-w-md">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Buat Password Baru</h1>
-        <p className="mt-2 text-sm text-gray-600">Masukkan password baru Anda.</p>
+        <h1 className="text-3xl font-bold text-gray-900">Create New Password</h1>
+        <p className="mt-2 text-sm text-gray-600">Enter your new password below.</p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Password Baru</label>
+          <label className="block text-sm font-medium text-gray-700">New Password</label>
           <div className="relative mt-1">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><FiLock className="h-4 w-4" /></span>
             <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} className="block w-full rounded-md border border-gray-300 py-2.5 pl-10 pr-10 text-sm" required minLength={8} disabled={loading} />
@@ -51,7 +51,7 @@ function ResetPasswordFormContent() {
           </div>
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Verifikasi Password Baru</label>
+          <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>
           <div className="relative mt-1">
             <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><FiLock className="h-4 w-4" /></span>
             <input type={showConfirm ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} className="block w-full rounded-md border border-gray-300 py-2.5 pl-10 pr-10 text-sm" required minLength={8} disabled={loading} />
@@ -59,7 +59,7 @@ function ResetPasswordFormContent() {
           </div>
         </div>
         <button type="submit" disabled={loading} className="w-full rounded-md bg-blue-600 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50">
-          {loading ? 'Menyimpan...' : 'Simpan Password Baru'}
+          {loading ? 'Saving...' : 'Save New Password'}
         </button>
       </form>
     </div>

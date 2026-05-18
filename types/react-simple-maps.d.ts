@@ -103,7 +103,7 @@ declare module 'react-simple-maps' {
     rsmKey: string;
 
     // Property tambahan
-    // Berisi nama negara dll
+    // Berisi nama negara
     properties?: Record<string, unknown>;
 
     // Property bebas lainnya

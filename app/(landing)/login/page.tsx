@@ -1,5 +1,6 @@
 import { AuthPreview } from "@/features/auth/components/AuthPreview";
 import { LoginForm } from "@/features/auth/components/LoginForm";
+import { Logo } from "@/shared/Logo";
 import Link from "next/link";
 
 
@@ -11,8 +12,7 @@ export default function LoginPage() {
                 {/* Logo Product */}
                 <div className="mb-8">
                     <Link href="/" className="flex items-center gap-2 text-2xl font-bold">
-                        <span className="text-3xl">🚀</span>
-                        <span>SMM Panel</span>
+                        <Logo variant='full' size={60} priority/>
                     </Link>
                 </div>
                 <LoginForm />

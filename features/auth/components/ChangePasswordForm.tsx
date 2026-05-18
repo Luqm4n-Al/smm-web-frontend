@@ -32,15 +32,15 @@ export function ChangePasswordForm() {
 
     // Validasi
     if (formData.newPassword.length < 8) {
-      toast.error('Password baru minimal 8 karakter');
+      toast.error('New password must be at least 8 characters');
       return;
     }
     if (formData.newPassword !== formData.confirmPassword) {
-      toast.error('Password baru dan konfirmasi tidak cocok');
+      toast.error('New password and confirmation do not match');
       return;
     }
     if (formData.oldPassword === formData.newPassword) {
-      toast.error('Password baru tidak boleh sama dengan password lama');
+      toast.error('New password must be different from old password');
       return;
     }
 
@@ -56,7 +56,7 @@ export function ChangePasswordForm() {
 
       // Backend mengembalikan String, bisa berupa pesan sukses atau token baru
       if (data?.changePassword) {
-        toast.success('Password berhasil diubah! Silakan login dengan password baru.');
+        toast.success('Password changed successfully! Please sign in with your new password.');
 
         // Logout untuk mengakhiri sesi password sementara
         await signOut({ redirect: false });
@@ -86,21 +86,21 @@ export function ChangePasswordForm() {
             className='mb-6 flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600'
         >
             <FiArrowLeft className='h-4 w-4'/>
-                Kembali ke Register
+                Back to Sign In
         </button>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Ganti Password</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Change Password</h1>
         <p className="mt-2 text-sm text-gray-600">
-          Ubah password sebelumnya dengan password baru
+          Replace your previous password with a new one.
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Password Lama */}
+        {/* Old Password */}
         <div>
           <label htmlFor="oldPassword" className={labelClass}>
-            Password Lama
+            Old Password
           </label>
           <div className="relative mt-1">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
@@ -112,7 +112,7 @@ export function ChangePasswordForm() {
               value={formData.oldPassword}
               onChange={handleChange}
               className={`${inputClass} pl-10`}
-              placeholder="Masukkan password lama"
+              placeholder="Enter old password"
               required
               disabled={loading}
             />
@@ -127,10 +127,10 @@ export function ChangePasswordForm() {
           </div>
         </div>
 
-        {/* Password Baru */}
+        {/* New Password */}
         <div>
           <label htmlFor="newPassword" className={labelClass}>
-            Password Baru
+            New Password
           </label>
           <div className="relative mt-1">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
@@ -142,7 +142,7 @@ export function ChangePasswordForm() {
               value={formData.newPassword}
               onChange={handleChange}
               className={`${inputClass} pl-10`}
-              placeholder="Minimal 8 karakter"
+              placeholder="At least 8 characters"
               required
               minLength={8}
               disabled={loading}
@@ -158,10 +158,10 @@ export function ChangePasswordForm() {
           </div>
         </div>
 
-        {/* Verifikasi Password Baru */}
+        {/* Confirm New Password */}
         <div>
           <label htmlFor="confirmPassword" className={labelClass}>
-            Verifikasi Password Baru
+            Confirm New Password
           </label>
           <div className="relative mt-1">
             <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
@@ -173,7 +173,7 @@ export function ChangePasswordForm() {
               value={formData.confirmPassword}
               onChange={handleChange}
               className={`${inputClass} pl-10`}
-              placeholder="Ulangi password baru"
+              placeholder="Re-enter new password"
               required
               minLength={8}
               disabled={loading}
@@ -194,7 +194,7 @@ export function ChangePasswordForm() {
           disabled={loading}
           className="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Mengganti Password...' : 'Ganti Password'}
+          {loading ? 'Changing Password...' : 'Change Password'}
         </button>
       </form>
     </div>

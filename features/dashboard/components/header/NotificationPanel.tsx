@@ -16,41 +16,41 @@ const dummyNotifications: Notification[] = [
   {
     id: '1',
     type: 'comment',
-    title: 'Komentar Baru',
-    description: '@sarah mengomentari postingan "Tips Karir"',
-    time: '2 menit lalu',
+    title: 'New Comment',
+    description: '@sarah commented on your post "Career Tips"',
+    time: '2 minutes ago',
     read: false,
   },
   {
     id: '2',
     type: 'like',
-    title: 'Like Baru',
-    description: 'Postingan "Behind the Scene" mendapat 50 likes',
-    time: '10 menit lalu',
+    title: 'New Likes',
+    description: 'Your post "Behind the Scene" received 50 likes',
+    time: '10 minutes ago',
     read: false,
   },
   {
     id: '3',
     type: 'follow',
-    title: 'Pengikut Baru',
-    description: '@john_doe mulai mengikuti Anda',
-    time: '1 jam lalu',
+    title: 'New Follower',
+    description: '@john_doe started following you',
+    time: '1 hour ago',
     read: true,
   },
   {
     id: '4',
     type: 'system',
-    title: 'Laporan Siap',
-    description: 'Laporan analitik mingguan telah siap diunduh',
-    time: '3 jam lalu',
+    title: 'Report Ready',
+    description: 'Your weekly analytics report is ready to download',
+    time: '3 hours ago',
     read: true,
   },
   {
     id: '5',
     type: 'comment',
-    title: 'Komentar Baru',
-    description: '@alex menyebut Anda dalam komentar',
-    time: '5 jam lalu',
+    title: 'New Comment',
+    description: '@alex mentioned you in a comment',
+    time: '5 hours ago',
     read: true,
   },
 ];
@@ -92,8 +92,8 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
         {/* Header */}
         <div className="flex items-center justify-between border-b px-4 py-3">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Notifikasi</h3>
-            <p className="text-xs text-gray-500">{unreadCount} belum dibaca</p>
+            <h3 className="text-lg font-semibold text-gray-900">Notifications</h3>
+            <p className="text-xs text-gray-500">{unreadCount} unread</p>
           </div>
           <button
             onClick={onClose}
@@ -103,11 +103,11 @@ export function NotificationPanel({ isOpen, onClose }: NotificationPanelProps) {
           </button>
         </div>
 
-        {/* Daftar Notifikasi */}
+        {/* Notification List */}
         <div className="h-[calc(100%-73px)] overflow-y-auto">
           {dummyNotifications.length === 0 ? (
             <div className="flex h-full items-center justify-center">
-              <p className="text-sm text-gray-500">Tidak ada notifikasi</p>
+              <p className="text-sm text-gray-500">No notifications</p>
             </div>
           ) : (
             <ul className="divide-y">

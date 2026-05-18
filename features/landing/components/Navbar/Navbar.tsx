@@ -33,8 +33,8 @@ export function Navbar() {
   };
 
   const featureItems = [
-    { label: 'Analytics Suite', href: 'analytic-feature' },
-    { label: 'Visual Scheduler', href: 'schedule-feature' },
+    { label: 'Analytics', href: 'analytic-feature' },
+    { label: 'Scheduling', href: 'schedule-feature' },
     { label: 'Insight', href: 'insight-feature' },
     { label: 'Recommendation', href: 'recommendation-feature' },
   ]
@@ -56,7 +56,7 @@ export function Navbar() {
               onClick={() => setIsDropdownOpen(!isDropdownOpen)}
               className="flex items-center gap-1 text-gray-700 hover:text-blue-600"
             >
-              Feature
+              Features
               <svg
                 className={`h-4 w-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
                 fill="none"
@@ -84,7 +84,7 @@ export function Navbar() {
             href="/register"
             className="rounded-md px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
           >
-            Daftar
+            Register
           </Link>
           <Link
             href="/login"

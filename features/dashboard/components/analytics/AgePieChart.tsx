@@ -30,8 +30,8 @@ export function AgePieChart({ data }: AgePieChartProps) {
   if (!data || data.length === 0) {
     return (
       <div className="rounded-lg border bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-lg font-medium text-gray-900">Usia Audiens</h2>
-        <div className="flex h-64 items-center justify-center text-gray-500">Belum ada data</div>
+        <h2 className="mb-4 text-lg font-medium text-gray-900">Audience Age</h2>
+        <div className="flex h-64 items-center justify-center text-gray-500">No data available</div>
       </div>
     );
   }

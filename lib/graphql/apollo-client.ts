@@ -1,5 +1,25 @@
 // lib/graphql/apollo-client.ts
 
+/**
+ * APOLLO CLIENT CONFIGURATION
+ * 
+ * File ini berfungsi sebagai pusat konfigurasi
+ * Apollo Client untuk aplikasi Next.js.
+ * 
+ * Fungsi utama:
+ * - Menghubungkan aplikasi ke GraphQL API.
+ * - Mengatur Query, Mutation, dan Subscription.
+ * - Mengelola authentication token.
+ * - Mengatur koneksi WebSocket realtime.
+ * - Mengatur Apollo cache.
+ * 
+ * Teknologi yang digunakan:
+ * - Apollo Client
+ * - graphql-ws
+ * - GraphQL Subscription
+ * - WebSocket
+ */
+
 import {
   ApolloClient,
   InMemoryCache,
@@ -8,179 +28,422 @@ import {
 } from '@apollo/client';
 
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
+
 import { createClient, Client } from 'graphql-ws';
+
 import { getMainDefinition } from '@apollo/client/utilities';
+
 import { setContext } from '@apollo/client/link/context';
 
-// ─────────────────────────────────────────────
-// HTTP Link
-// Digunakan untuk query & mutation
-// ─────────────────────────────────────────────
+/**
+ * HTTP LINK
+ * 
+ * HTTP Link digunakan untuk:
+ * - Query
+ * - Mutation
+ * 
+ * Request dikirim menggunakan HTTP biasa.
+ */
 const httpLink = createHttpLink({
+
+  /**
+   * Endpoint GraphQL API.
+   * 
+   * Diambil dari environment variable.
+   */
   uri: process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT,
+
+  /**
+   * Mengirim cookie/session credential.
+   */
   credentials: 'include',
 });
 
-// ─────────────────────────────────────────────
-// Auth Link
-// Inject Authorization header ke setiap request HTTP
-// ─────────────────────────────────────────────
+/**
+ * AUTH LINK
+ * 
+ * Auth Link digunakan untuk:
+ * - Menambahkan Authorization header
+ * - Mengirim JWT token ke server
+ * 
+ * Header akan otomatis ditambahkan
+ * ke setiap HTTP request.
+ */
 const authLink = setContext((_, { headers }) => {
+
+  /**
+   * Ambil token dari localStorage.
+   * 
+   * Validasi typeof window dilakukan karena:
+   * - localStorage hanya tersedia di browser
+   * - mencegah error saat SSR/server-side rendering
+   */
   const token =
     typeof window !== 'undefined'
       ? localStorage.getItem('token')
       : null;
 
   return {
+
     headers: {
+
+      // Pertahankan header lama
       ...headers,
-      authorization: token ? `Bearer ${token}` : '',
+
+      /**
+       * Inject bearer token.
+       * 
+       * Format:
+       * Authorization: Bearer xxx
+       */
+      authorization:
+        token ? `Bearer ${token}` : '',
     },
   };
 });
 
-// ─────────────────────────────────────────────
-// WebSocket Client (graphql-ws)
-// Pengganti subscriptions-transport-ws
-// Kompatibel dengan gqlgen >= 0.17
-// ─────────────────────────────────────────────
-let wsClient:Client | null = null
+/**
+ * WEBSOCKET CLIENT
+ * 
+ * Digunakan untuk:
+ * - GraphQL Subscription
+ * - Realtime update
+ * 
+ */
 
+/**
+ * Variable global websocket client.
+ */
+let wsClient: Client | null = null;
+
+/**
+ * WebSocket hanya dibuat di browser/client-side.
+ */
 if (typeof window !== 'undefined') {
-  const wsEndpoint = process.env.NEXT_PUBLIC_WS_ENDPOINT;
 
+  /**
+   * Endpoint websocket dari env.
+   */
+  const wsEndpoint =
+    process.env.NEXT_PUBLIC_WS_ENDPOINT;
+
+  /**
+   * Warning jika endpoint websocket tidak tersedia.
+   */
   if (!wsEndpoint) {
+
     console.warn(
+
       '[Apollo] NEXT_PUBLIC_WS_ENDPOINT is not defined. ' +
+
       'WebSocket subscriptions will not work. ' +
+
       'Please check your .env.local file.'
     );
+
   } else {
 
-  // Helper untuk exponential backoff retry
-  let retryCount = 0;
-  const getRetryDelay = () => {
-    // 1s, 2s, 4s, 8s, max 30s
-    const delay = Math.min(1000 * Math.pow(2, retryCount), 30_000);
-    retryCount += 1;
-    return delay;
-  };
+    /**
+     * EXPONENTIAL BACKOFF RETRY
+     * 
+     * Digunakan untuk:
+     * - reconnect websocket
+     * - menghindari spam reconnect
+     * - mengurangi beban server/network
+     */
 
-  wsClient = createClient({
-    url: wsEndpoint,
+    let retryCount = 0;
 
-    // Auto reconnect — retryAttempts sudah membatasi jumlah retry
-    shouldRetry: () => true,
+    /**
+     * Menghasilkan delay retry bertingkat:
+     * 
+     * 1s → 2s → 4s → 8s → max 30s
+     */
+    const getRetryDelay = () => {
 
-    retryAttempts: 5,
-    keepAlive: 10_000, // Keep-alive every 10 seconds
-    
-    // ✅ IMPROVED: Exponential backoff untuk reconnection
-    on: {
-      connecting: () => {
-        if (process.env.NODE_ENV === 'development') {
-          console.log('🔌 [WS] Connecting...');
-        }
-      },
+      const delay = Math.min(
+        1000 * Math.pow(2, retryCount),
+        30_000
+      );
 
-      connected: () => {
-        retryCount = 0; // Reset retry counter on successful connection
-        sessionStorage.removeItem('ws_error_logged');
-        if (process.env.NODE_ENV === 'development') {
-          console.log('✅ [WS] Connected!');
-        }
-      },
+      retryCount += 1;
 
-      closed: () => {
-        if (process.env.NODE_ENV === 'development') {
-          console.warn('⚠️  [WS] Connection closed');
-        }
-      },
+      return delay;
+    };
 
-      error: (error) => {
-        if (process.env.NODE_ENV === 'development') {
-          const errorKey = 'ws_error_logged';
-          if (!sessionStorage.getItem(errorKey)) {
-            const delay = getRetryDelay();
-            console.warn(
-              `⚠️  [WS] Connection failed (retry in ${delay}ms). Endpoint: ${process.env.NEXT_PUBLIC_WS_ENDPOINT}`,
-              error ?? '(no details)'
-            );
-            sessionStorage.setItem(errorKey, 'true');
+    /**
+     * CREATE WEBSOCKET CLIENT
+     */
+    wsClient = createClient({
+
+      /**
+       * URL websocket endpoint.
+       */
+      url: wsEndpoint,
+
+      /**
+       * AUTO RETRY CONNECTION
+       * 
+       * Mengaktifkan reconnect otomatis.
+       */
+      shouldRetry: () => true,
+
+      /**
+       * Maksimal retry reconnect.
+       */
+      retryAttempts: 5,
+
+      /**
+       * Keep connection tetap hidup
+       * setiap 10 detik.
+       */
+      keepAlive: 10_000,
+
+      /**
+       * WEBSOCKET EVENT LISTENER
+       */
+      on: {
+
+        /**
+         * Saat websocket mulai connect.
+         */
+        connecting: () => {
+
+          if (process.env.NODE_ENV === 'development') {
+
+            console.log('🔌 [WS] Connecting...');
           }
-        }
-      },
-    },
+        },
 
-    // Inject token saat koneksi WebSocket dibuat
-    connectionParams: () => {
-      const token = localStorage.getItem('token');
-      return {
-        Authorization: token ? `Bearer ${token}` : '',
-      };
-    },
-  });
+        /**
+         * Saat websocket berhasil connect.
+         */
+        connected: () => {
+
+          /**
+           * Reset retry counter.
+           */
+          retryCount = 0;
+
+          /**
+           * Hapus error log flag.
+           */
+          sessionStorage.removeItem('ws_error_logged');
+
+          if (process.env.NODE_ENV === 'development') {
+
+            console.log('✅ [WS] Connected!');
+          }
+        },
+
+        /**
+         * Saat websocket terputus.
+         */
+        closed: () => {
+
+          if (process.env.NODE_ENV === 'development') {
+
+            console.warn('⚠️  [WS] Connection closed');
+          }
+        },
+
+        /**
+         * Saat websocket mengalami error.
+         */
+        error: (error) => {
+
+          if (process.env.NODE_ENV === 'development') {
+
+            /**
+             * Hindari spam log error berulang.
+             */
+            const errorKey = 'ws_error_logged';
+
+            if (!sessionStorage.getItem(errorKey)) {
+
+              /**
+               * Hitung retry delay.
+               */
+              const delay = getRetryDelay();
+
+              console.warn(
+
+                `⚠️  [WS] Connection failed (retry in ${delay}ms). Endpoint: ${process.env.NEXT_PUBLIC_WS_ENDPOINT}`,
+
+                error ?? '(no details)'
+              );
+
+              sessionStorage.setItem(errorKey, 'true');
+            }
+          }
+        },
+      },
+
+      /**
+       * CONNECTION PARAMS
+       * 
+       * Authorization token untuk websocket.
+       * 
+       * Dikirim saat koneksi websocket dibuat.
+       */
+      connectionParams: () => {
+
+        const token =
+          localStorage.getItem('token');
+
+        return {
+
+          Authorization:
+            token ? `Bearer ${token}` : '',
+        };
+      },
+    });
   }
 }
 
-// ─────────────────────────────────────────────
-// WebSocket Link
-// ─────────────────────────────────────────────
-const wsLink = wsClient ? new GraphQLWsLink(wsClient) : null;
+/**
+ * WEBSOCKET LINK
+ * 
+ * Link khusus untuk subscription.
+ */
+const wsLink =
+  wsClient
+    ? new GraphQLWsLink(wsClient)
+    : null;
 
-// ─────────────────────────────────────────────
-// Split Link
-// Subscription → WebSocket
-// Query & Mutation → HTTP + Auth
-// ─────────────────────────────────────────────
+/**
+ * SPLIT LINK
+ * 
+ * Digunakan untuk memisahkan:
+ * 
+ * Subscription:
+ * → WebSocket
+ * 
+ * Query & Mutation:
+ * → HTTP + Auth
+ */
 const splitLink = wsLink
+
   ? split(
+
+      /**
+       * Mengecek jenis operation GraphQL.
+       */
       ({ query }) => {
-        const definition = getMainDefinition(query);
+
+        const definition =
+          getMainDefinition(query);
+
         return (
+
           definition.kind === 'OperationDefinition' &&
+
           definition.operation === 'subscription'
         );
       },
+
+      /**
+       * Jika subscription:
+       * gunakan websocket.
+       */
       wsLink,
+
+      /**
+       * Selain subscription:
+       * gunakan HTTP + Auth.
+       */
       authLink.concat(httpLink)
     )
+
   : authLink.concat(httpLink);
 
-// ─────────────────────────────────────────────
-// Apollo Client Instance
-// ─────────────────────────────────────────────
-export const apolloClient = new ApolloClient({
-  link: splitLink,
-  cache: new InMemoryCache(),
-});
+/**
+ * APOLLO CLIENT INSTANCE
+ * 
+ * Instance utama Apollo Client.
+ */
+export const apolloClient =
+  new ApolloClient({
 
-// ─────────────────────────────────────────────
-// Close WebSocket Connection
-// Gunakan saat: logout, page unload
-// ─────────────────────────────────────────────
+    /**
+     * Link utama aplikasi.
+     */
+    link: splitLink,
+
+    /**
+     * Cache memory Apollo.
+     */
+    cache: new InMemoryCache(),
+  });
+
+/**
+ * CLOSE WEBSOCKET CONNECTION
+ * 
+ * Digunakan saat:
+ * - logout
+ * - page unload
+ * - cleanup session
+ */
 export async function closeApolloWebSocket() {
-  if (typeof window === 'undefined' || !wsClient) return;
+
+  /**
+   * Hindari eksekusi di server.
+   */
+  if (
+    typeof window === 'undefined' ||
+    !wsClient
+  ) return;
 
   try {
+
+    /**
+     * Tutup websocket connection.
+     */
     await wsClient.dispose();
+
   } catch (error) {
+
+    /**
+     * Error logging development only.
+     */
     if (process.env.NODE_ENV === 'development') {
-      console.error('❌ [WS] Error closing WebSocket:', error);
+
+      console.error(
+        '❌ [WS] Error closing WebSocket:',
+        error
+      );
     }
   }
 }
 
-// ─────────────────────────────────────────────
-// Reset Apollo Cache
-// Gunakan saat: logout
-// ─────────────────────────────────────────────
+/**
+ * RESET APOLLO CACHE
+ * 
+ * Digunakan saat:
+ * - logout
+ * - clear session
+ * - reset user state
+ */
 export async function resetApolloCache() {
+
   try {
+
+    /**
+     * Hapus seluruh Apollo cache.
+     */
     await apolloClient.clearStore();
+
   } catch (error) {
+
+    /**
+     * Error logging development only.
+     */
     if (process.env.NODE_ENV === 'development') {
-      console.error('❌ Error clearing Apollo cache:', error);
+
+      console.error(
+        '❌ Error clearing Apollo cache:',
+        error
+      );
     }
   }
 }

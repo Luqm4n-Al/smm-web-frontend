@@ -39,7 +39,7 @@ function LoginFormContent({ isFirstLogin: isFirstLoginProp = false }: LoginFormP
         });
 
         if (res?.error) {
-            setError('Username atau password salah');
+            setError('Invalid username or password');
             setIsLoading(false);
         } else if (res?.ok) {
             // Cek apakah user baru saja mengganti password
@@ -75,10 +75,10 @@ function LoginFormContent({ isFirstLogin: isFirstLoginProp = false }: LoginFormP
             if (res?.ok) {
                 router.push('/dashboard');
             } else {
-                setError('Gagal login dengan Google. Silakan coba lagi.');
+                setError('Failed to sign in with Google. Please try again.');
             }
         } catch (err: unknown) {
-            const message = err instanceof Error ? err.message : 'Gagal login dengan Google';
+            const message = err instanceof Error ? err.message : 'Failed to sign in with Google';
             setError(message);
             toast.error(message);
         } finally {
@@ -91,23 +91,23 @@ function LoginFormContent({ isFirstLogin: isFirstLoginProp = false }: LoginFormP
             {/* Header Form */}
             <div className="mb-8">
                 <h1 className="text-3xl font-bold text-gray-900">
-                    {isFirstLogin ? 'Selamat Datang! Silahkan Login' : 'Log in'}
+                    {isFirstLogin ? 'Welcome! Please Sign In' : 'Sign In'}
                 </h1>
 
                 {isFirstLogin ? (
                     <div className='mt-2'>
                         <p className='text-sm text-gray-600'>
-                            Gunakan username dan password sementara dari email anda
+                            Use the username and temporary password sent to your email.
                         </p>
                         <p className='mt-1 text-xs text-blue-600'>
-                            Anda akan diminta mengganti password setelah login.
+                            You will be asked to change your password after signing in.
                         </p>
                     </div>
                     ):(
                     <p className='mt-2 text-sm text-gray-600'>
-                        Belum punya akun?{' '}
+                        Don&apos;t have an account?{' '}
                         <Link href="/register" className='font-medium text-blue-600 hover:text-blue-500'>
-                            Daftar Sekarang
+                            Register Now
                         </Link>
                     </p>
                     )
@@ -134,7 +134,7 @@ function LoginFormContent({ isFirstLogin: isFirstLoginProp = false }: LoginFormP
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         className="mt-1 block w-full rounded-md border border-gray-300 px-4 py-3 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        placeholder="Masukkan username"
+                        placeholder="Enter your username"
                         required
                     />
                 </div>
@@ -151,7 +151,7 @@ function LoginFormContent({ isFirstLogin: isFirstLoginProp = false }: LoginFormP
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className="block w-full rounded-md border border-gray-300 px-4 py-3 pr-10 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            placeholder="Masukkan password"
+                            placeholder="Enter your password"
                             required
                         />
                         <button
@@ -169,13 +169,13 @@ function LoginFormContent({ isFirstLogin: isFirstLoginProp = false }: LoginFormP
                         </div>
                 </div>
 
-                {/* Tombol Masuk */}
+                {/* Sign In Button */}
                 <button
                     type="submit"
                     disabled={isLoading}
                     className="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {isLoading ? 'Sedang Masuk...' : 'Masuk'}
+                    {isLoading ? 'Signing In...' : 'Sign In'}
                 </button>
 
                 {/* Divider */}
@@ -184,11 +184,11 @@ function LoginFormContent({ isFirstLogin: isFirstLoginProp = false }: LoginFormP
                         <div className="w-full border-t border-gray-300" />
                     </div>
                     <div className="relative flex justify-center text-sm">
-                        <span className="bg-white px-2 text-gray-500">atau</span>
+                        <span className="bg-white px-2 text-gray-500">or</span>
                     </div>
                 </div>
 
-                {/* Masuk dengan Google */}
+                {/* Sign In with Google */}
                 <button
                     type="button"
                     onClick={handleGoogleLogin}
@@ -196,7 +196,7 @@ function LoginFormContent({ isFirstLogin: isFirstLoginProp = false }: LoginFormP
                     className="flex w-full items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <FcGoogle className="h-5 w-5" />
-                    Masuk dengan Google
+                    Sign in with Google
                 </button>
             </form>
         </div>

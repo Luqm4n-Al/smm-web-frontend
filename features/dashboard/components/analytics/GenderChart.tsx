@@ -33,7 +33,7 @@ export function GenderChart({ data }: GenderChartProps) {
           <h2 className="text-lg font-medium text-gray-900">Gender</h2>
         </div>
         <div className="flex h-40 items-center justify-center text-gray-500">
-          Belum ada data
+          No data available
         </div>
       </div>
     );

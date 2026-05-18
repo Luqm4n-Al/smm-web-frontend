@@ -14,7 +14,7 @@ import {
   isSameDay,
   isToday,
 } from 'date-fns';
-import { id } from 'date-fns/locale';
+import { enUS } from 'date-fns/locale';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 interface Event {
@@ -41,7 +41,7 @@ export function CustomCalendar({ events, selectedDate: selectedDateProp, onSelec
   const days = eachDayOfInterval({ start: startDate, end: endDate });
 
   // Urutan dimulai dari Senin sesuai weekStartsOn: 1
-  const weekDays = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+  const weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   const handleDateClick = (day: Date) => {
     setSelectedDate(day);
@@ -59,7 +59,7 @@ export function CustomCalendar({ events, selectedDate: selectedDateProp, onSelec
       {/* Header Bulan & Navigasi */}
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900">
-          {format(currentMonth, 'MMMM yyyy', { locale: id })}
+          {format(currentMonth, 'MMMM yyyy', { locale: enUS })}
         </h2>
         <div className="flex items-center gap-2">
           <button
@@ -125,7 +125,7 @@ export function CustomCalendar({ events, selectedDate: selectedDateProp, onSelec
                   </div>
                 ))}
                 {dayEvents.length > 2 && (
-                  <div className="text-[10px] text-gray-500">+{dayEvents.length - 2} lagi</div>
+                  <div className="text-[10px] text-gray-500">+{dayEvents.length - 2} more</div>
                 )}
               </div>
             </div>
@@ -137,7 +137,7 @@ export function CustomCalendar({ events, selectedDate: selectedDateProp, onSelec
       {selectedEvents.length > 0 && (
         <div className="mt-4 border-t pt-4">
           <h3 className="mb-2 text-sm font-medium text-gray-700">
-            Agenda {selectedDate && format(selectedDate, 'dd MMMM yyyy', { locale: id })}
+            Events on {selectedDate && format(selectedDate, 'MMMM dd, yyyy', { locale: enUS })}
           </h3>
           <ul className="space-y-2">
             {selectedEvents.map((event, idx) => (

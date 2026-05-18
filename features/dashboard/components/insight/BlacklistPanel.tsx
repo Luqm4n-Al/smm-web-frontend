@@ -22,7 +22,7 @@ export function BlacklistPanel({ blacklists }: BlacklistPanelProps) {
     if (!newWord.trim()) return;
     try {
       await addBlacklist({ variables: { input: { word: newWord.trim() } } });
-      toast.success('Kata ditambahkan');
+      toast.success('Word added');
       setNewWord('');
     } catch (err: unknown) {
       toast.error(extractErrorMessage(err));
@@ -32,7 +32,7 @@ export function BlacklistPanel({ blacklists }: BlacklistPanelProps) {
   const handleRemove = async (id: string) => {
     try {
       await removeBlacklist({ variables: { id } });
-      toast.success('Kata dihapus');
+      toast.success('Word removed');
     } catch (err: unknown) {
       toast.error(extractErrorMessage(err));
     }
@@ -40,13 +40,13 @@ export function BlacklistPanel({ blacklists }: BlacklistPanelProps) {
 
   return (
     <div className="rounded-lg border bg-white p-4 shadow-sm">
-      <h3 className="mb-2 text-lg font-medium">Blacklist Keyword</h3>
+      <h3 className="mb-2 text-lg font-medium">Blacklist Keywords</h3>
       <div className="flex gap-2 mb-3">
         <input
           value={newWord}
           onChange={e => setNewWord(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleAdd()}
-          placeholder="Kata..."
+          placeholder="Keyword..."
           className="flex-1 rounded-md border px-3 py-1.5 text-sm"
         />
         <button onClick={handleAdd} className="rounded-md bg-blue-600 px-3 py-1.5 text-white text-sm">

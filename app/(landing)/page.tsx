@@ -20,7 +20,7 @@ export default function LandingPage() {
       <RecommendationFeature
         id='recommendation-feature'
       />
-      {/* Nanti tambahkan fitur-fitur di sini */}
+      {/* Additional features can be added here */}
     </main>
   );
 }

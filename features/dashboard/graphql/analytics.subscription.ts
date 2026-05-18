@@ -8,11 +8,11 @@ import type { Analytics } from './analytics.types';
 // secara real-time ketika ada perubahan data.
 //
 // Fields yang diterima:
-// - heatmap: Geographic distribution data untuk peta
-// - ageRange: Demographic data distribusi usia
-// - genderAudience: Demographic data distribusi gender
-// - socialMedia: Engagement metrics dari Instagram & TikTok
-// - growthMatrix: Trend data untuk growth chart
+// - heatmap
+// - ageRange
+// - genderAudience
+// - socialMedia
+// - growthMatrix
 //
 // Protocol: WebSocket (graphql-ws)
 // Endpoint: NEXT_PUBLIC_WS_ENDPOINT
@@ -22,68 +22,68 @@ export const ANALYTICS_UPDATED_SUBSCRIPTION = gql`
     analyticsUpdated {
       # Geographic heatmap data
       heatmap {
-        level      # Color intensity level (1-5)
-        code       # Country code (e.g., "ID", "US")
-        value      # Number of followers in that region
+        level     
+        code       
+        value      
       }
       
-      # Age range demographic distribution
+      # Age range 
       ageRange {
-        age        # Age range label (e.g., "18-24", "25-34")
-        quantity   # Number of followers in this age group
+        age        
+        quantity   
       }
       
-      # Gender demographic distribution
+      # Gender 
       genderAudience {
-        gender     # "M" untuk Laki-laki, "F" untuk Perempuan
-        quantity   # Number of followers
+        gender     
+        quantity   
       }
       
-      # Social media engagement data
+      # Social media data
       socialMedia {
         # Instagram metrics
         instagram {
-          followers    # Total Instagram followers
-          totalViews   # Total video/post views
-          totalLikes   # Total likes received
+          followers    
+          totalViews   
+          totalLikes   
           sentiments {
-            positive   # Positive comment count
-            neutral    # Neutral comment count
-            negative   # Negative comment count
+            positive   
+            neutral    
+            negative   
           }
         }
         
         # TikTok metrics
         tiktok {
-          followers    # Total TikTok followers
-          totalViews   # Total video views
-          totalLikes   # Total likes received
+          followers    
+          totalViews   
+          totalLikes   
           sentiments {
-            positive   # Positive comment count
-            neutral    # Neutral comment count
-            negative   # Negative comment count
+            positive   
+            neutral    
+            negative   
           }
         }
       }
       
       # Growth trend data untuk line chart
       growthMatrix {
-        # Followers growth over time
+        # Followers growth 
         followers {
-          date       # ISO date string (YYYY-MM-DD)
-          quantity   # Follower count on that date
+          date       
+          quantity   
         }
         
-        # Likes growth over time
+        # Likes growth 
         likes {
-          date       # ISO date string
-          quantity   # Total likes on that date
+          date       
+          quantity   
         }
         
-        # Views growth over time
+        # Views growth 
         views {
-          date       # ISO date string
-          quantity   # Total views on that date
+          date       
+          quantity   
         }
       }
     }
@@ -104,7 +104,7 @@ export const useAnalyticsSubscription = () => {
     ANALYTICS_UPDATED_SUBSCRIPTION
   );
 
-  // Return data in standard format for components
+  // Return data ke standard format untuk components
   return {
     liveData: data?.analyticsUpdated,
     isLiveLoading: loading,

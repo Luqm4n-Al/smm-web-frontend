@@ -4,7 +4,7 @@ import Link from "next/link";
 export function HeroSection() {
   const handleScrollToAnalytic = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    const element = document.getElementById('analytic-featuure');
+    const element = document.getElementById('analytic-feature');
     if (element) {
       element.scrollIntoView({behavior: 'smooth'})
     }
@@ -18,7 +18,7 @@ export function HeroSection() {
           <span className="text-blue-600">Social Vista</span>
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-600">
-          Solusi bagi Anda yang membutuhkan perencanaan, publikasi, dan peningkatan performa konten media sosial.
+          Plan, schedule, and boost your social media content performance — all in one platform.
         </p>
         <div className="mt-10">
           <Link
@@ -27,7 +27,7 @@ export function HeroSection() {
             onClick={handleScrollToAnalytic}
             className="rounded-md bg-blue-600 px-6 py-3 text-white hover:bg-blue-700"
           >
-            Lihat Fitur
+            Explore Features
           </Link>
         </div>
       </div>

@@ -32,7 +32,6 @@ export function ProfileForm() {
 
   const profile = data?.UserInfo;
 
-  // ✅ Gunakan tipe spesifik SocialAccount[]
   const socialAccounts: SocialAccount[] = profile?.social_account ?? [];
   const instagramAccount = socialAccounts.find(s => s.platform === 'instagram');
   const tiktokAccount = socialAccounts.find(s => s.platform === 'tiktok');

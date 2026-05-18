@@ -17,7 +17,7 @@ const platformColors = {
 
 export function InsightCard({post}: InsightCardProps) {
     const sentimentColor = post.avgSentiment > 0 ? 'text-green-600' : post.avgSentiment < 0 ? 'text-red-600' : 'text-gray-500';
-    const sentimentLabel = post.avgSentiment > 0.1 ? 'Positif' : post.avgSentiment < -0.1 ? 'Negatif' : 'Netral';
+    const sentimentLabel = post.avgSentiment > 0.1 ? 'Positive' : post.avgSentiment < -0.1 ? 'Negative' : 'Neutral';
 
     return (
         <div className="rounded-lg border bg-white shadow-sm overflow-hidden">

@@ -17,9 +17,9 @@ export function SentimentSection({ positive, neutral, negative }: SentimentSecti
   const negativePercent = total > 0 ? 100 - positivePercent - neutralPercent : 0;
 
   const getSentimentLabel = (score: number) => {
-    if (score >= 0.1) return 'Positif';
-    if (score <= -0.1) return 'Negatif';
-    return 'Netral';
+    if (score >= 0.1) return 'Positive';
+    if (score <= -0.1) return 'Negative';
+    return 'Neutral';
   };
 
   const sentimentLabel = getSentimentLabel(score);
@@ -40,8 +40,8 @@ export function SentimentSection({ positive, neutral, negative }: SentimentSecti
           <span className="text-3xl font-bold text-gray-900">{score.toFixed(2)}</span>
           <span className="text-sm text-gray-500">Polarity Score</span>
           <span className={`ml-auto rounded-full px-3 py-1 text-sm font-medium ${
-            sentimentLabel === 'Positif' ? 'bg-green-100 text-green-800' :
-            sentimentLabel === 'Negatif' ? 'bg-red-100 text-red-800' :
+            sentimentLabel === 'Positive' ? 'bg-green-100 text-green-800' :
+            sentimentLabel === 'Negative' ? 'bg-red-100 text-red-800' :
             'bg-gray-100 text-gray-800'
           }`}>{sentimentLabel}</span>
         </div>

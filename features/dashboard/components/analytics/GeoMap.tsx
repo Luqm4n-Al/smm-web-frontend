@@ -53,10 +53,10 @@ const NON_STANDARD_CODES: Record<string, string> = {
 // Semakin besar value maka warna semakin gelap
 const COLOR_SCALE = [
   { min: 1000, color: '#1d4ed8' },
-  { min: 500,  color: '#2563eb' },
-  { min: 200,  color: '#3b82f6' },
-  { min: 1,    color: '#60a5fa' },
-  { min: 0,    color: '#e5e7eb' },
+  { min: 500, color: '#2563eb' },
+  { min: 200, color: '#3b82f6' },
+  { min: 1, color: '#60a5fa' },
+  { min: 0, color: '#e5e7eb' },
 ];
 
 
@@ -215,12 +215,12 @@ export function GeoMap({ data }: GeoMapProps) {
 
         {/* Judul */}
         <h2 className="text-lg font-medium text-gray-900">
-          Persebaran Followers
+          Audience Location
         </h2>
 
         {/* Subtitle */}
         <span className="ml-auto text-xs text-gray-500">
-          Berdasarkan lokasi
+          By Location
         </span>
       </div>
 
@@ -435,7 +435,7 @@ export function GeoMap({ data }: GeoMapProps) {
         {/* Tidak ada data */}
         <div className="flex items-center gap-1">
           <span className="h-3 w-3 rounded-sm bg-[#e5e7eb]"></span>
-          <span>Tidak ada data</span>
+          <span>No data</span>
         </div>
       </div>
     </div>

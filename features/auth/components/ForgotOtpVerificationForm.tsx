@@ -33,7 +33,7 @@ function ForgotOtpVerificationFormContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (otp.length !== 6) {
-      toast.error('Masukkan 6 digit kode OTP');
+      toast.error('Please enter the 6-digit OTP code');
       return;
     }
     try {
@@ -41,7 +41,7 @@ function ForgotOtpVerificationFormContent() {
         variables: { input: { email, phone, otp } },
       });
       if (data?.verifyOTPForgotPassword) {
-        toast.success('OTP berhasil diverifikasi');
+        toast.success('OTP verified successfully');
         router.push(`/forgot-password/reset?token=${data.verifyOTPForgotPassword}`);
       }
     } catch (err: unknown) {
@@ -54,11 +54,11 @@ function ForgotOtpVerificationFormContent() {
   return (
     <div className="w-full max-w-md">
       <button type="button" onClick={() => router.push('/forgot-password')} className="mb-6 flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600">
-        <FiArrowLeft className="h-4 w-4" /> Kembali
+        <FiArrowLeft className="h-4 w-4" /> Back
       </button>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Verifikasi OTP</h1>
-        <p className="mt-2 text-sm text-gray-600">Masukkan kode OTP yang dikirim ke email Anda.</p>
+        <h1 className="text-3xl font-bold text-gray-900">OTP Verification</h1>
+        <p className="mt-2 text-sm text-gray-600">Enter the OTP code sent to your email.</p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
@@ -66,18 +66,18 @@ function ForgotOtpVerificationFormContent() {
           <input type="email" value={email} disabled className="mt-1 block w-full rounded-md border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-500" />
         </div>
         <div>
-          <label htmlFor="otp" className="block text-sm font-medium text-gray-700">Kode OTP</label>
+          <label htmlFor="otp" className="block text-sm font-medium text-gray-700">OTP Code</label>
           <input ref={inputRef} id="otp" type="text" inputMode="numeric" maxLength={6} value={otp} onChange={e => setOtp(e.target.value.replace(/\D/g, ''))} className="mt-1 block w-full rounded-md border border-gray-300 px-4 py-3 text-center text-2xl tracking-[0.5em] font-bold shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500" placeholder="000000" required disabled={loading} />
         </div>
         <div className="text-center">
           {timer === 0 ? (
-            <button type="button" onClick={() => { /* nanti bisa resend khusus */ }} className="text-sm font-medium text-blue-600 hover:text-blue-500">Kirim Ulang Kode</button>
+            <button type="button" onClick={() => { /* resend handler */ }} className="text-sm font-medium text-blue-600 hover:text-blue-500">Resend Code</button>
           ) : (
-            <p className="text-sm text-gray-500">Kirim Ulang kode : {formatCountdownTime(timer)}</p>
+            <p className="text-sm text-gray-500">Resend code in {formatCountdownTime(timer)}</p>
           )}
         </div>
         <button type="submit" disabled={loading} className="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:opacity-50">
-          {loading ? 'Memverifikasi...' : 'Verifikasi'}
+          {loading ? 'Verifying...' : 'Verify'}
         </button>
       </form>
     </div>

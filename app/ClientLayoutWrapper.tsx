@@ -12,11 +12,11 @@ import { closeApolloWebSocket, resetApolloCache } from '@/lib/graphql/apollo-cli
  * Wrapper component di sisi client
  * 
  * Fungsi utama:
- * - Membersihkan resource saat logout
- * - Menutup koneksi WebSocket
- * - Reset cache Apollo
- * - Menghapus token dari localStorage
- * - Cleanup saat user meninggalkan halaman
+ * Membersihkan resource saat logout
+ * Menutup koneksi WebSocket
+ * Reset cache Apollo
+ * Menghapus token dari localStorage
+ * Cleanup saat user meninggalkan halaman
  */
 export function ClientLayoutWrapper({ children }: { children: React.ReactNode }) {
 

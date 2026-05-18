@@ -25,7 +25,7 @@ export function HashtagCloud() {
                     </span>
                 ))}
             </div>
-            <p className="mt-4 text-xs text-gray-500">Hashtag ini meningkatkan reach hingga 35%</p>
+            <p className="mt-4 text-xs text-gray-500">These hashtags can increase your reach by up to 35%</p>
         </div>
     )
 }
