@@ -1,0 +1,23 @@
+name: Auto Deploy Frontend
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Deploy Application
+        run: |
+          cd /home/chandika/social-vista/service/frontend-social-vista
+
+          git pull origin main
+
+          docker compose up --build -d
+
+          docker image prune -f
+
+          docker builder prune -f
