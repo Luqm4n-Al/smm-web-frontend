@@ -8,6 +8,8 @@ import { FiEye, FiEyeOff, FiLock, FiArrowLeft } from 'react-icons/fi';
 import { useChangePasswordMutation } from '../graphql/change-password.mutation';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/error-utils';
+import { isPasswordValid } from '@/lib/validation-utils';
+import { PasswordStrengthIndicator } from './PasswordStrengthIndicator';
 
 export function ChangePasswordForm() {
   const router = useRouter();
@@ -31,8 +33,8 @@ export function ChangePasswordForm() {
     e.preventDefault();
 
     // Validasi
-    if (formData.newPassword.length < 8) {
-      toast.error('New password must be at least 8 characters');
+    if (!isPasswordValid(formData.newPassword)) {
+      toast.error('Password must be at least 8 characters and contain an uppercase letter, a number, and a symbol');
       return;
     }
     if (formData.newPassword !== formData.confirmPassword) {
@@ -156,6 +158,7 @@ export function ChangePasswordForm() {
               {showNew ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
             </button>
           </div>
+          <PasswordStrengthIndicator password={formData.newPassword} />
         </div>
 
         {/* Confirm New Password */}

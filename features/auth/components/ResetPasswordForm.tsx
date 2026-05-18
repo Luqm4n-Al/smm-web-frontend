@@ -6,6 +6,8 @@ import { useChangeForgottenPasswordMutation } from '../graphql/change-forgotten-
 import { FiLock, FiEye, FiEyeOff } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 import { extractErrorMessage } from '@/lib/error-utils';
+import { isPasswordValid } from '@/lib/validation-utils';
+import { PasswordStrengthIndicator } from './PasswordStrengthIndicator';
 
 function ResetPasswordFormContent() {
   const router = useRouter();
@@ -20,7 +22,10 @@ function ResetPasswordFormContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (password.length < 8) { toast.error('Password must be at least 8 characters'); return; }
+    if (!isPasswordValid(password)) {
+      toast.error('Password must be at least 8 characters and contain an uppercase letter, a number, and a symbol');
+      return;
+    }
     if (password !== confirmPassword) { toast.error('Passwords do not match'); return; }
     try {
       const { data } = await changePassword({
@@ -49,6 +54,7 @@ function ResetPasswordFormContent() {
             <input type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} className="block w-full rounded-md border border-gray-300 py-2.5 pl-10 pr-10 text-sm" required minLength={8} disabled={loading} />
             <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600">{showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}</button>
           </div>
+          <PasswordStrengthIndicator password={password} />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700">Confirm New Password</label>

@@ -8,6 +8,8 @@ import { useRegisterMutation } from '../graphql/register.mutation';
 import toast from 'react-hot-toast';
 import { FiArrowLeft } from 'react-icons/fi';
 import { extractErrorMessage } from '@/lib/error-utils';
+import { validateEmail } from '@/lib/validation-utils';
+import { EmailValidationHint } from './EmailValidationHint';
 import { signInWithPopup } from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
 import { signIn } from 'next-auth/react';
@@ -16,6 +18,7 @@ export function RegisterForm() {
   const router = useRouter();
   const [registerMutation, { loading }] = useRegisterMutation();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [emailTouched, setEmailTouched] = useState(false);
 
   const [formData, setFormData] = useState({
     username: '',
@@ -31,6 +34,13 @@ export function RegisterForm() {
     e.preventDefault();
 
     try {
+      // Validate email before sending to backend
+      const emailResult = validateEmail(formData.email);
+      if (!emailResult.isValid) {
+        toast.error(emailResult.error || 'Please enter a valid email address');
+        return;
+      }
+
       const { data } = await registerMutation({
         variables: {
           input: {
@@ -125,11 +135,13 @@ export function RegisterForm() {
             type="email"
             value={formData.email}
             onChange={handleChange}
+            onBlur={() => setEmailTouched(true)}
             className="mt-1 block w-full rounded-md border border-gray-300 px-4 py-3 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-            placeholder="example@email.com"
+            placeholder="example@gmail.com"
             required
             disabled={loading}
           />
+          <EmailValidationHint email={formData.email} touched={emailTouched} />
         </div>
 
         {/* Phone */}
