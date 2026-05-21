@@ -1,7 +1,6 @@
 import { AuthPreview } from "@/features/auth/components/AuthPreview";
 import { OtpVerificationForm } from "@/features/auth/components/OtpVerificationForm";
 import { Logo } from "@/shared/Logo";
-import Link from "next/link";
 
 
 export default async function verifyOtpPage({
@@ -20,9 +19,7 @@ export default async function verifyOtpPage({
             <div className="flex flex-1 flex-col items-center justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
                 {/* Logo */}
                 <div className="mb-8">
-                    <Link href="/" className="flex items-center gap-2 text-2xl font-bold">
-                        <Logo variant='full' size={60} priority/>
-                    </Link>
+                    <Logo variant='full' size={60} priority/>
                 </div>
 
                 <OtpVerificationForm email={email} phone={phone} username={username}/>

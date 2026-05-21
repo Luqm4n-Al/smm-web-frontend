@@ -15,13 +15,13 @@ interface GenderChartProps {
 
 // Mapping label & warna untuk setiap gender
 const GENDER_DISPLAY: Record<string, { label: string; color: string }> = {
-  male: { label: 'Laki-laki', color: '#3b82f6' },   // Biru
-  female: { label: 'Perempuan', color: '#ec4899' },   // Pink
-  unknown: { label: 'Rahasia', color: '#9ca3af' }, // Abu‑abu
+  male: { label: 'Male', color: '#3b82f6' },   // Biru
+  female: { label: 'Female', color: '#ec4899' },   // Pink
+  unknown: { label: 'Unknown', color: '#9ca3af' }, // Abu‑abu
 };
 
 // Fallback jika gender tidak dikenali
-const DEFAULT_GENDER = { label: 'Lainnya', color: '#6b7280' };
+const DEFAULT_GENDER = { label: 'Other', color: '#6b7280' };
 
 export function GenderChart({ data }: GenderChartProps) {
   // Kondisi tidak ada data
