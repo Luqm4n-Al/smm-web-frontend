@@ -10,7 +10,7 @@ export function Sidebar() {
         <aside className="flex h-screen w-64 flex-col border-r bg-white">
             {/* Logo */}
             <div className="flex h-16 items-center justify-center border-b px-4">
-                <Logo variant="full" size={50} priority/>
+                <Logo variant="full" size={50} href="/dashboard" priority/>
             </div>
             <SidebarNav/>
             <SidebarFooter/>

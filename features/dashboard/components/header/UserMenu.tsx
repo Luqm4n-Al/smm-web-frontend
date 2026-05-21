@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 export function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
 
+  // Tombol Logout
   const handleLogout = () => {
     toast.success('You have been logged out');
     signOut({ callbackUrl: '/' });
@@ -23,7 +24,7 @@ export function UserMenu() {
         <FiUser className="h-4 w-4 text-gray-600" />
       </button>
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 rounded-md border bg-white py-1 shadow-lg">
+        <div className="absolute right-0 mt-2 w-48 rounded-md border bg-white py-1 shadow-lg z-50">
           <Link
             href="/dashboard/profile"
             className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

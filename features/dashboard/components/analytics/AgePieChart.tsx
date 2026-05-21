@@ -13,7 +13,7 @@ interface AgePieChartProps {
   data: AgeData[];
 }
 
-const UNKNOWN_LABEL = 'Tidak diketahui';
+const UNKNOWN_LABEL = 'Unknown';
 
 /**
  * Formatter untuk Tooltip Recharts yang kompatibel dengan tipe bawaan.
@@ -56,7 +56,7 @@ export function AgePieChart({ data }: AgePieChartProps) {
 
   const RADIAN = Math.PI / 180;
 
-  // Label custom (menggunakan tipe bawaan PieLabelRenderProps)
+  // Label custom (PieLabelRenderProps)
   const renderCustomizedLabel = ({
     cx = 0,
     cy = 0,
@@ -85,11 +85,11 @@ export function AgePieChart({ data }: AgePieChartProps) {
 
   return (
     <div className="rounded-lg border bg-white p-6 shadow-sm">
-      <h2 className="mb-4 text-lg font-medium text-gray-900">Usia Audiens</h2>
+      <h2 className="mb-4 text-lg font-medium text-gray-900">Audiens Age</h2>
 
       {chartData.length === 0 ? (
         <div className="flex h-64 items-center justify-center text-gray-500">
-          Seluruh data usia tidak diketahui
+          All audiens age is unknown
         </div>
       ) : (
         <div className="h-64">
@@ -108,7 +108,7 @@ export function AgePieChart({ data }: AgePieChartProps) {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              {/* ✅ Tooltip dengan formatter yang aman */}
+              {/* Formatter */}
               <Tooltip formatter={tooltipFormatter} />
               <Legend />
             </PieChart>

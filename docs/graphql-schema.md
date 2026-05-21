@@ -246,11 +246,11 @@ contentSchedules {
 
 ```graphql
 topHashtags {
-  platform      # INSTAGRAM | TIKTOK
-  topHashtag    # string hashtag
-  rank          # peringkat
-  score         # skor relevansi
-  createdAt     # timestamp
+  platform      
+  topHashtag    
+  rank          
+  score         
+  createdAt     
 }
 ```
 
