@@ -8,7 +8,7 @@ export default function UserManagementHeader() {
       </h1>
 
       <p className="text-sm text-gray-500">
-        Kelola pengguna platform dan pantau status akun.
+        Manage platform users and monitor account status.
       </p>
     </div>
   );

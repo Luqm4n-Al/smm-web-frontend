@@ -17,29 +17,62 @@ export default function DashboardStats({
   activeUsers = 0,
   inactiveUsers = 0,
 }: Props) {
+  /**
+   * TOTAL USERS
+   */
+  const totalUsers =
+    activeUsers +
+    inactiveUsers;
+
+  /**
+   * ACTIVE %
+   */
+  const activeGrowth =
+    totalUsers > 0
+      ? `${Math.round(
+          (activeUsers /
+            totalUsers) *
+            100
+        )}%`
+      : '0%';
+
+  /**
+   * INACTIVE %
+   */
+  const inactiveGrowth =
+    totalUsers > 0
+      ? `${Math.round(
+          (inactiveUsers /
+            totalUsers) *
+            100
+        )}%`
+      : '0%';
+
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      {/* ACTIVE */}
       <DashboardStatCard
         title="Active Users"
-        value={activeUsers.toString()}
-        growth="+12.5%"
+        value={activeUsers}
+        growth={activeGrowth}
         increase={true}
         icon={
           <ShieldCheck
-            size={18}
+            size={20}
             className="text-blue-600"
           />
         }
       />
 
+      {/* INACTIVE */}
       <DashboardStatCard
         title="Inactive Users"
-        value={inactiveUsers.toString()}
-        growth="-8.3%"
+        value={inactiveUsers}
+        growth={inactiveGrowth}
         increase={false}
         icon={
           <ShieldX
-            size={18}
+            size={20}
             className="text-gray-500"
           />
         }

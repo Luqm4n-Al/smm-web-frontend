@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 
-import UserManagementFilters from '@/features/admin/components/user-management/UserManagementFilters';
+import UserManagementFilters from '@/features/admin/components/user-management/UserManagementToolbar';
 import UserManagementHeader from '@/features/admin/components/user-management/UserManagementHeader';
 import UserManagementPagination from '@/features/admin/components/user-management/UserManagementPagination';
 import UserManagementTable from '@/features/admin/components/user-management/UserManagementTable';
@@ -10,35 +10,52 @@ import UserManagementTable from '@/features/admin/components/user-management/Use
 import { useUserManagementTable } from '@/features/admin/hooks/useUserManagementTable';
 
 export default function UserManagementPage() {
-  // SEARCH
+  /**
+   * SEARCH
+   */
   const [search, setSearch] =
     useState('');
 
-  // FILTER ROLE
-  const [role, setRole] =
-    useState('All Roles');
-
-  // FILTER STATUS
+  /**
+   * STATUS
+   */
   const [status, setStatus] =
     useState<
       'All' | 'Active' | 'Inactive'
     >('All');
 
-  // SORT
-  const [sort, setSort] =
+  /**
+   * LOGIN PERIOD
+   */
+  const [startDate, setStartDate] =
+    useState('');
+
+  const [endDate, setEndDate] =
+    useState('');
+
+  /**
+   * SORT
+   */
+  const [sort] =
     useState('None');
 
-  // PAGINATION
+  /**
+   * PAGE
+   */
   const [page, setPage] =
     useState(1);
 
-  // ROWS PER PAGE
+  /**
+   * USERS PER PAGE
+   */
   const [
     usersPerPage,
     setUsersPerPage,
   ] = useState(5);
 
-  // HOOK
+  /**
+   * TABLE
+   */
   const {
     loading,
     filteredUsers,
@@ -46,14 +63,17 @@ export default function UserManagementPage() {
     handleChangeStatus,
   } = useUserManagementTable({
     search,
-    role,
     status,
     sort,
     page,
     usersPerPage,
+    startDate,
+    endDate,
   });
 
-  // TOTAL PAGE
+  /**
+   * TOTAL PAGE
+   */
   const totalPages = useMemo(() => {
     return Math.max(
       1,
@@ -67,6 +87,24 @@ export default function UserManagementPage() {
     usersPerPage,
   ]);
 
+  /**
+   * START DATE
+   */
+  const handleStartDate = (
+    value: string
+  ) => {
+    setStartDate(value);
+  };
+
+  /**
+   * END DATE
+   */
+  const handleEndDate = (
+    value: string
+  ) => {
+    setEndDate(value);
+  };
+
   return (
     <div className="space-y-6">
       {/* HEADER */}
@@ -75,12 +113,18 @@ export default function UserManagementPage() {
       {/* FILTER */}
       <div className="flex justify-end">
         <UserManagementFilters
-          role={role}
-          setRole={setRole}
           search={search}
           setSearch={setSearch}
           status={status}
           setStatus={setStatus}
+          startDate={startDate}
+          endDate={endDate}
+          onChangeStartDate={
+            handleStartDate
+          }
+          onChangeEndDate={
+            handleEndDate
+          }
           setPage={setPage}
         />
       </div>

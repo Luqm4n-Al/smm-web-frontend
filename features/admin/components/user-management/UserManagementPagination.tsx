@@ -31,43 +31,62 @@ export default function UserManagementPagination({
     totalPages
   );
 
+  /**
+   * START - END DATA
+   */
+  const startData =
+    totalUsers === 0
+      ? 0
+      : (page - 1) *
+          usersPerPage +
+        1;
+
+  const endData = Math.min(
+    page * usersPerPage,
+    totalUsers
+  );
+
   return (
-    <div className="flex flex-col gap-4 rounded-[10px] border border-black-100 bg-white px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="flex flex-col gap-4 rounded-[10px] border border-black-100 bg-white px-6 py-4 shadow-sm lg:flex-row lg:items-center lg:justify-between">
       {/* LEFT */}
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-gray-500">
-          Rows per page
-        </span>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
 
-        <select
-          value={usersPerPage}
-          onChange={(e) => {
-            setUsersPerPage(
-              Number(
-                e.target.value
-              )
-            );
+        {/* ROWS */}
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-500">
+            Rows per page
+          </span>
 
-            setPage(1);
-          }}
-          className="h-9 rounded-[8px] border border-gray-200 bg-white px-3 text-sm text-gray-700 outline-none"
-        >
-          <option value={5}>
-            5
-          </option>
+          <select
+            value={usersPerPage}
+            onChange={(e) => {
+              setUsersPerPage(
+                Number(
+                  e.target.value
+                )
+              );
 
-          <option value={10}>
-            10
-          </option>
+              setPage(1);
+            }}
+            className="h-10 rounded-[10px] border border-gray-200 bg-gray-50 px-3 text-sm font-medium text-gray-700 outline-none transition focus:border-blue-500 focus:bg-white"
+          >
+            <option value={5}>
+              5
+            </option>
 
-          <option value={20}>
-            20
-          </option>
+            <option value={10}>
+              10
+            </option>
 
-          <option value={50}>
-            50
-          </option>
-        </select>
+            <option value={20}>
+              20
+            </option>
+
+            <option value={50}>
+              50
+            </option>
+          </select>
+        </div>
       </div>
 
       {/* RIGHT */}
@@ -80,39 +99,41 @@ export default function UserManagementPagination({
               Math.max(prev - 1, 1)
             )
           }
-          className="flex h-9 items-center rounded-[8px] border border-gray-200 px-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-10 items-center rounded-[10px] border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Prev
         </button>
 
         {/* PAGES */}
-        {pages.map(
-          (item, index) =>
-            item === '...' ? (
-              <span
-                key={index}
-                className="px-1 text-sm text-gray-500"
-              >
-                ...
-              </span>
-            ) : (
-              <button
-                key={index}
-                onClick={() =>
-                  setPage(
-                    item as number
-                  )
-                }
-                className={`flex h-9 w-9 items-center justify-center rounded-[8px] border text-sm font-medium transition ${
-                  page === item
-                    ? 'border-blue-600 bg-blue-600 text-white'
-                    : 'border-gray-200 text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                {item}
-              </button>
-            )
-        )}
+        <div className="flex items-center gap-2">
+          {pages.map(
+            (item, index) =>
+              item === '...' ? (
+                <span
+                  key={index}
+                  className="px-1 text-sm text-gray-400"
+                >
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={index}
+                  onClick={() =>
+                    setPage(
+                      item as number
+                    )
+                  }
+                  className={`flex h-10 w-10 items-center justify-center rounded-[10px] border text-sm font-semibold transition-all duration-200 ${
+                    page === item
+                      ? 'border-blue-600 bg-blue-600 text-white shadow-sm'
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600'
+                  }`}
+                >
+                  {item}
+                </button>
+              )
+          )}
+        </div>
 
         {/* NEXT */}
         <button
@@ -127,7 +148,7 @@ export default function UserManagementPagination({
               )
             )
           }
-          className="flex h-9 items-center rounded-[8px] border border-gray-200 px-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50"
+          className="flex h-10 items-center rounded-[10px] border border-gray-200 bg-white px-4 text-sm font-medium text-gray-700 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Next
         </button>

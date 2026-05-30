@@ -1,72 +1,124 @@
-// halaman utama user management (penghubung agar menjadi satu halaman)
-
 'use client';
 
-import { useMemo, useState } from 'react';
+import {
+  useMemo,
+  useState,
+} from 'react';
 
-import UserManagementFilters from './UserManagementFilters';
+import UserManagementFilters from './UserManagementToolbar';
+
 import UserManagementPagination from './UserManagementPagination';
+
 import UserManagementTable from './UserManagementTable';
 
 import { useUserManagementTable } from '../../hooks/useUserManagementTable';
 
 export default function UserManagementPage() {
-  // SEARCH
+  /**
+   * SEARCH
+   */
   const [search, setSearch] =
     useState('');
 
-  // FILTER ROLE
-  const [role, setRole] =
-    useState('All Roles');
-
-  // FILTER STATUS
+  /**
+   * STATUS
+   */
   const [status, setStatus] =
     useState<
       'All' | 'Active' | 'Inactive'
     >('All');
 
-  // SORT
-  const [sort, setSort] =
+  /**
+   * LOGIN PERIOD
+   */
+  const [startDate, setStartDate] =
+    useState('');
+
+  const [endDate, setEndDate] =
+    useState('');
+
+  /**
+   * SORT
+   */
+  const [sort] =
     useState('None');
 
-  // PAGINATION
+  /**
+   * PAGE
+   */
   const [page, setPage] =
     useState(1);
 
-  // ROWS
+  /**
+   * USERS PER PAGE
+   */
   const [
     usersPerPage,
     setUsersPerPage,
   ] = useState(10);
 
-  // HOOK
+  /**
+   * TABLE
+   */
   const {
     loading,
+
     filteredUsers,
+
     paginatedUsers,
+
     handleChangeStatus,
   } = useUserManagementTable({
     search,
-    role,
+
     status,
+
     sort,
+
     page,
+
     usersPerPage,
+
+    startDate,
+
+    endDate,
   });
 
-  // TOTAL PAGE
-  const totalPages = useMemo(() => {
-    return Math.max(
-      1,
-      Math.ceil(
-        filteredUsers.length /
-          usersPerPage
-      )
-    );
-  }, [
-    filteredUsers,
-    usersPerPage,
-  ]);
+  /**
+   * TOTAL PAGES
+   */
+  const totalPages =
+    useMemo(() => {
+      return Math.max(
+        1,
+        Math.ceil(
+          filteredUsers.length /
+            usersPerPage
+        )
+      );
+    }, [
+      filteredUsers,
+      usersPerPage,
+    ]);
+
+  /**
+   * HANDLE START DATE
+   */
+  const handleStartDate =
+    (
+      value: string
+    ) => {
+      setStartDate(value);
+    };
+
+  /**
+   * HANDLE END DATE
+   */
+  const handleEndDate = (
+    value: string
+  ) => {
+    setEndDate(value);
+  };
 
   return (
     <div className="space-y-5">
@@ -77,20 +129,27 @@ export default function UserManagementPage() {
         </h1>
 
         <p className="mt-1 text-sm text-gray-500">
-          Kelola pengguna platform dan
-          pantau status akun.
+          Kelola pengguna
+          platform dan pantau
+          status akun.
         </p>
       </div>
 
       {/* FILTER */}
       <div className="flex justify-end">
         <UserManagementFilters
-          role={role}
-          setRole={setRole}
-          status={status}
-          setStatus={setStatus}
           search={search}
           setSearch={setSearch}
+          status={status}
+          setStatus={setStatus}
+          startDate={startDate}
+          endDate={endDate}
+          onChangeStartDate={
+            handleStartDate
+          }
+          onChangeEndDate={
+            handleEndDate
+          }
           setPage={setPage}
         />
       </div>

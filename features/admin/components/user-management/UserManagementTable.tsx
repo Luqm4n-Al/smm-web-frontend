@@ -1,73 +1,103 @@
+// UserManagementTable.tsx
+
 'use client';
 
-import type { User } from '@/features/admin/services/userService';
-
 import UserManagementRow from './UserManagementRow';
+
+export interface User {
+  id: string;
+
+  username: string;
+
+  email: string;
+
+  role: string;
+
+  isActive: boolean;
+
+  createdAt: string;
+
+  lastLoginAt: string | null;
+}
 
 interface Props {
   loading: boolean;
 
-  users: User[];
+  users?: User[];
 
   onChangeStatus: (
     id: string,
     status: 'Active' | 'Inactive'
-  ) => void;
+  ) => Promise<void>;
 }
 
 export default function UserManagementTable({
   loading,
-  users,
+  users = [],
   onChangeStatus,
 }: Props) {
   return (
-    <div className="overflow-hidden rounded-[10px] border border-black bg-white">
+    <div className="overflow-hidden rounded-[10px] border border-black-100 bg-white shadow-sm">
       {/* HEADER */}
-      <div className="grid grid-cols-[1.5fr_2fr_1fr_1.2fr_1.2fr_120px] items-center bg-gray-50 px-5 py-4">
-        <div className="text-sm font-semibold text-gray-700">
+      <div className="grid grid-cols-[2.6fr_2.2fr_1fr_1.3fr_1.7fr_170px] items-center border-b border-gray-100 bg-gray-50 px-7 py-4">
+        {/* USER */}
+        <div className="pl-1 text-xs font-semibold uppercase tracking-[0.08em] text-gray-500">
           User
         </div>
 
-        <div className="text-sm font-semibold text-gray-700">
+        {/* EMAIL */}
+        <div className="text-xs font-semibold uppercase tracking-[0.08em] text-gray-500">
           Email
         </div>
 
-        <div className="text-sm font-semibold text-gray-700">
+        {/* ROLE */}
+        <div className="text-xs font-semibold uppercase tracking-[0.08em] text-gray-500">
           Role
         </div>
 
-        <div className="text-sm font-semibold text-gray-700">
+        {/* ADD DATE */}
+        <div className="text-xs font-semibold uppercase tracking-[0.08em] text-gray-500">
           Add Date
         </div>
 
-        <div className="text-sm font-semibold text-gray-700">
-          Last Active
+        {/* LAST LOGIN */}
+        <div className="text-xs font-semibold uppercase tracking-[0.08em] text-gray-500">
+          Last Login
         </div>
 
-        <div className="text-center text-sm font-semibold text-gray-700">
+        {/* STATUS */}
+        <div className="pl-3 text-xs font-semibold uppercase tracking-[0.08em] text-gray-500">
           Status
         </div>
       </div>
 
       {/* BODY */}
-      <div>
+      <div className="relative divide-y divide-gray-100">
         {loading ? (
-          <div className="flex h-40 items-center justify-center text-sm text-gray-500">
-            Loading users...
+          <div className="flex h-56 items-center justify-center">
+            <p className="text-sm text-gray-500">
+              Loading users...
+            </p>
           </div>
         ) : users.length === 0 ? (
-          <div className="flex h-40 items-center justify-center text-sm text-gray-500">
-            No users found.
+          <div className="flex h-56 items-center justify-center">
+            <p className="text-sm text-gray-500">
+              No users found.
+            </p>
           </div>
         ) : (
           users.map((user) => (
-            <UserManagementRow
+            <div
               key={user.id}
-              user={user}
-              onChangeStatus={
-                onChangeStatus
-              }
-            />
+              className="relative"
+            >
+              <UserManagementRow
+                user={user}
+                onChangeStatus={
+                  onChangeStatus
+                }
+              />
+            </div>
           ))
         )}
       </div>

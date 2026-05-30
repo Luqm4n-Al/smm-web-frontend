@@ -53,14 +53,22 @@ export const authOptions: NextAuthOptions = {
 
       // Field input yang digunakan di halaman login
       credentials: {
-        username: { label: 'Username', type: 'text' },
-        password: { label: 'Password', type: 'password' },
+        username: {
+          label: 'Username',
+          type: 'text',
+        },
+
+        password: {
+          label: 'Password',
+          type: 'password',
+        },
       },
 
       /**
        * Fungsi authorize
        * 
        * Dipanggil saat user login
+       * 
        * Bertugas:
        * - Mengirim request ke backend (GraphQL)
        * - Mengambil access_token & refresh_token
@@ -68,46 +76,95 @@ export const authOptions: NextAuthOptions = {
        */
       async authorize(credentials) {
         // Validasi input
-        if (!credentials?.username || !credentials?.password) {
+        if (
+          !credentials?.username ||
+          !credentials?.password
+        ) {
           return null;
         }
 
-        // Request ke GraphQL endpoint (mutation login)
-        const res = await fetch(process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+        try {
+          // Request ke GraphQL endpoint (mutation login)
+          const res = await fetch(
+            process.env
+              .NEXT_PUBLIC_GRAPHQL_ENDPOINT!,
+            {
+              method: 'POST',
 
-          body: JSON.stringify({
-            query: `
-              mutation Login($input: LoginInput!) {
-                login(input: $input) {
-                  access_token
-                  refresh_token
-                }
-              }
-            `,
-            variables: {
-              input: {
-                username: credentials.username,
-                password: credentials.password,
+              headers: {
+                'Content-Type':
+                  'application/json',
               },
-            },
-          }),
-        });
 
-        const { data } = await res.json();
+              body: JSON.stringify({
+                query: `
+                  mutation LoginAdmin($input: LoginInput!) {
+                    login(input: $input) {
+                      access_token
+                      refresh_token
+                    }
+                  }
+                `,
 
-        // Jika login berhasil, kembalikan object user + token
-        if (data?.login) {
-          return {
-            id: credentials.username,
-            accessToken: data.login.access_token,
-            refreshToken: data.login.refresh_token,
-          };
+                variables: {
+                  input: {
+                    username:
+                      credentials.username,
+
+                    password:
+                      credentials.password,
+                  },
+                },
+              }),
+            }
+          );
+
+          // Ambil response JSON
+          const json = await res.json();
+
+          // Debug response backend
+          console.log(
+            'LOGIN RESPONSE:',
+            json
+          );
+
+          const { data, errors } = json;
+
+          // Jika ada error GraphQL
+          if (errors) {
+            console.error(
+              'GRAPHQL ERROR:',
+              errors
+            );
+
+            return null;
+          }
+
+          // Jika login berhasil,
+          // kembalikan object user + token
+          if (data?.login) {
+            return {
+              id: credentials.username,
+
+              accessToken:
+                data.login.access_token,
+
+              refreshToken:
+                data.login.refresh_token,
+            };
+          }
+
+          // Jika login gagal
+          return null;
+        } catch (error) {
+          // Error fetch / server
+          console.error(
+            'LOGIN ERROR:',
+            error
+          );
+
+          return null;
         }
-
-        // Jika gagal, return null → login dianggap gagal
-        return null;
       },
     }),
   ],
@@ -129,9 +186,13 @@ export const authOptions: NextAuthOptions = {
      */
     async jwt({ token, user }) {
       if (user) {
-        token.accessToken = user.accessToken;
-        token.refreshToken = user.refreshToken;
+        token.accessToken =
+          user.accessToken;
+
+        token.refreshToken =
+          user.refreshToken;
       }
+
       return token;
     },
 
@@ -144,9 +205,13 @@ export const authOptions: NextAuthOptions = {
      */
     async session({ session, token }) {
       if (session.user) {
-        session.user.accessToken = token.accessToken;
-        session.user.refreshToken = token.refreshToken;
+        session.user.accessToken =
+          token.accessToken;
+
+        session.user.refreshToken =
+          token.refreshToken;
       }
+
       return session;
     },
   },

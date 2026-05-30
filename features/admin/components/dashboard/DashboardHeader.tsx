@@ -6,7 +6,7 @@ export default function DashboardHeader() {
       </h1>
 
       <p className="mt-1 text-sm text-gray-500">
-        Monitor aktivitas platform dan pengguna.
+        Monitor platform and user activity.
       </p>
     </div>
   );

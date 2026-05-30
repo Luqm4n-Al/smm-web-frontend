@@ -1,6 +1,5 @@
 'use client';
 
-import DashboardChart from '@/features/admin/components/dashboard/DashboardChart';
 import DashboardHeader from '@/features/admin/components/dashboard/DashboardHeader';
 import DashboardRecentUsers from '@/features/admin/components/dashboard/DashboardRecentUsers';
 import DashboardStats from '@/features/admin/components/dashboard/DashboardStats';
@@ -36,8 +35,6 @@ export default function DashboardPage() {
           loading={loading}
         />
       </div>
-
-      <DashboardChart />
     </div>
   );
 }

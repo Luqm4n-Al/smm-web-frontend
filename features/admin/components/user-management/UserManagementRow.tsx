@@ -1,6 +1,31 @@
 'use client';
 
-import type { User } from '@/features/admin/services/userService';
+import { useState } from 'react';
+
+import {
+  CheckCircle2,
+  Clock3,
+  Info,
+  Loader2,
+  MoreVertical,
+  XCircle,
+} from 'lucide-react';
+
+interface User {
+  id: string;
+
+  username: string;
+
+  email: string;
+
+  role: string;
+
+  isActive: boolean | string;
+
+  createdAt: string;
+
+  lastLoginAt: string | null;
+}
 
 interface Props {
   user: User;
@@ -8,38 +33,193 @@ interface Props {
   onChangeStatus: (
     id: string,
     status: 'Active' | 'Inactive'
-  ) => void;
+  ) => Promise<void>;
 }
 
 export default function UserManagementRow({
   user,
   onChangeStatus,
 }: Props) {
-  const handleToggleStatus =
-    () => {
-      const newStatus =
-        user.status ===
-        'Active'
-          ? 'Inactive'
-          : 'Active';
+  /**
+   * DROPDOWN
+   */
+  const [openMenu, setOpenMenu] =
+    useState(false);
 
-      onChangeStatus(
-        user.id,
-        newStatus
+  /**
+   * LOGIN DETAIL
+   */
+  const [
+    openLoginDetail,
+    setOpenLoginDetail,
+  ] = useState(false);
+
+  /**
+   * LOCAL STATUS
+   */
+  const [
+    localStatus,
+    setLocalStatus,
+  ] = useState(
+    user.isActive === true ||
+      user.isActive === 'true'
+  );
+
+  /**
+   * LOADING
+   */
+  const [
+    loadingStatus,
+    setLoadingStatus,
+  ] = useState(false);
+
+  /**
+   * AVATAR
+   */
+  const initials =
+    user.username
+      ?.slice(0, 2)
+      .toUpperCase() || 'US';
+
+  /**
+   * FORMAT DATE
+   */
+  const formatDate = (
+    dateString: string
+  ) => {
+    const splitDate =
+      dateString.split('T');
+
+    if (!splitDate[0]) {
+      return '-';
+    }
+
+    const date = new Date(
+      splitDate[0]
+    );
+
+    return date.toLocaleDateString(
+      'en-US',
+      {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      }
+    );
+  };
+
+  /**
+   * LAST LOGIN DATE
+   * TANPA CONVERT TIMEZONE
+   */
+  const formatLastLogin = (
+    dateString: string
+  ) => {
+    const splitDate =
+      dateString.split('T');
+
+    if (!splitDate[0]) {
+      return '-';
+    }
+
+    const date = new Date(
+      splitDate[0]
+    );
+
+    return date.toLocaleDateString(
+      'en-US',
+      {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      }
+    );
+  };
+
+  /**
+   * LAST LOGIN TIME
+   * TANPA CONVERT TIMEZONE
+   */
+  const formatLastLoginTime = (
+    dateString: string
+  ) => {
+    /**
+     * CONTOH:
+     * 2026-05-23T12:27:18.525252Z
+     */
+
+    const splitDate =
+      dateString.split('T');
+
+    if (!splitDate[1]) {
+      return '-';
+    }
+
+    /**
+     * AMBIL JAM SAJA
+     */
+    return splitDate[1]
+      .replace('Z', '')
+      .split('.')[0];
+  };
+
+  /**
+   * CHANGE STATUS
+   */
+  const handleStatusChange =
+    async (
+      status:
+        | 'Active'
+        | 'Inactive'
+    ) => {
+      /**
+       * OPTIMISTIC UPDATE
+       */
+      const previousStatus =
+        localStatus;
+
+      setLocalStatus(
+        status === 'Active'
       );
+
+      setLoadingStatus(true);
+
+      try {
+        await onChangeStatus(
+          user.id,
+          status
+        );
+
+        setOpenMenu(false);
+      } catch (error) {
+        /**
+         * ROLLBACK
+         */
+        setLocalStatus(
+          previousStatus
+        );
+
+        console.error(error);
+      } finally {
+        setLoadingStatus(false);
+      }
     };
 
   return (
-    <div className="grid grid-cols-[1.5fr_2fr_1fr_1.2fr_1.2fr_120px] items-center border-b border-gray-100 px-5 py-4 transition hover:bg-gray-50">
+    <div className="grid grid-cols-[2.6fr_2.2fr_1fr_1.3fr_1.7fr_170px] items-center px-7 py-4 transition-all duration-200 hover:bg-gray-50">
       {/* USER */}
-      <div className="min-w-0">
-        <p className="truncate text-sm font-medium text-gray-900">
+      <div className="flex items-center gap-3">
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
+          {initials}
+        </div>
+
+        <p className="text-sm font-semibold text-gray-900">
           {user.username}
         </p>
       </div>
 
       {/* EMAIL */}
-      <div className="min-w-0">
+      <div>
         <p className="truncate text-sm text-gray-500">
           {user.email}
         </p>
@@ -47,40 +227,178 @@ export default function UserManagementRow({
 
       {/* ROLE */}
       <div>
-        <p className="text-sm text-gray-700">
+        <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold uppercase text-gray-700">
           {user.role}
-        </p>
+        </span>
       </div>
 
       {/* ADD DATE */}
       <div>
         <p className="text-sm text-gray-500">
-          {user.addDate}
+          {formatDate(
+            user.createdAt
+          )}
         </p>
       </div>
 
-      {/* LAST ACTIVE */}
-      <div>
-        <p className="text-sm text-gray-500">
-          {user.lastActive}
-        </p>
+      {/* LAST LOGIN */}
+      <div className="relative">
+        {user.lastLoginAt ? (
+          <>
+            <button
+              onClick={() =>
+                setOpenLoginDetail(
+                  !openLoginDetail
+                )
+              }
+              className="group flex items-center gap-2 text-sm text-gray-600 transition"
+            >
+              <span>
+                {formatLastLogin(
+                  user.lastLoginAt
+                )}
+              </span>
+
+              <Info
+                size={14}
+                className="text-gray-400 transition group-hover:text-blue-500"
+              />
+            </button>
+
+            {/* POPUP */}
+            <div
+              className={`absolute left-0 top-9 z-50 w-56 rounded-[12px] border border-gray-200 bg-white p-4 shadow-xl transition-all duration-200 ${
+                openLoginDetail
+                  ? 'visible translate-y-0 opacity-100'
+                  : 'invisible -translate-y-2 opacity-0'
+              }`}
+            >
+              {/* HEADER */}
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                  Login Detail
+                </p>
+
+                <div className="rounded bg-green-100 px-2 py-[2px] text-[10px] font-semibold text-green-700">
+                  CURRENT
+                </div>
+              </div>
+
+              {/* TIME */}
+              <div className="mt-4 flex items-center gap-2">
+                <Clock3
+                  size={16}
+                  className="text-blue-500"
+                />
+
+                <p className="text-sm font-semibold text-gray-900">
+                  {formatLastLoginTime(
+                    user.lastLoginAt
+                  )}
+                </p>
+              </div>
+
+              {/* DATE */}
+              <p className="mt-2 text-xs text-gray-500">
+                {formatLastLogin(
+                  user.lastLoginAt
+                )}
+              </p>
+            </div>
+          </>
+        ) : (
+          <p className="text-sm text-gray-400">
+            Never login
+          </p>
+        )}
       </div>
 
       {/* STATUS */}
-      <div className="flex justify-center">
-        <button
-          onClick={
-            handleToggleStatus
-          }
-          className={`min-w-[90px] rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-            user.status ===
-            'Active'
-              ? 'bg-green-100 text-green-700 hover:bg-green-200'
-              : 'bg-red-100 text-red-600 hover:bg-red-200'
+      <div className="relative flex items-center">
+        <div className="flex items-center gap-2">
+          {/* BADGE */}
+          <div
+            className={`flex min-w-[90px] items-center justify-center rounded-full px-3 py-[7px] text-xs font-semibold transition-all duration-200 ${
+              localStatus
+                ? 'bg-green-100 text-green-700'
+                : 'bg-red-100 text-red-600'
+            }`}
+          >
+            {loadingStatus ? (
+              <Loader2
+                size={14}
+                className="animate-spin"
+              />
+            ) : localStatus ? (
+              'Active'
+            ) : (
+              'Inactive'
+            )}
+          </div>
+
+          {/* MENU */}
+          <button
+            disabled={
+              loadingStatus
+            }
+            onClick={() =>
+              setOpenMenu(
+                !openMenu
+              )
+            }
+            className="rounded-lg p-1 transition hover:bg-gray-100 disabled:opacity-50"
+          >
+            <MoreVertical
+              size={16}
+              className="text-gray-500"
+            />
+          </button>
+        </div>
+
+        {/* DROPDOWN */}
+        <div
+          className={`absolute right-0 top-11 z-[100] w-40 rounded-[12px] border border-gray-200 bg-white p-1 shadow-2xl transition-all duration-200 ${
+            openMenu
+              ? 'visible translate-y-0 opacity-100'
+              : 'invisible -translate-y-2 opacity-0'
           }`}
         >
-          {user.status}
-        </button>
+          {!localStatus && (
+            <button
+              onClick={() =>
+                handleStatusChange(
+                  'Active'
+                )
+              }
+              className="flex w-full items-center gap-2 rounded-[10px] px-3 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-green-50"
+            >
+              <CheckCircle2
+                size={16}
+                className="text-green-600"
+              />
+
+              Active
+            </button>
+          )}
+
+          {localStatus && (
+            <button
+              onClick={() =>
+                handleStatusChange(
+                  'Inactive'
+                )
+              }
+              className="flex w-full items-center gap-2 rounded-[10px] px-3 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-red-50"
+            >
+              <XCircle
+                size={16}
+                className="text-red-500"
+              />
+
+              Inactive
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
