@@ -1,10 +1,9 @@
 'use client'
 
-import { FiHeart, FiEye } from "react-icons/fi"
+import { useState } from "react";
+import { FiHeart, FiEye, FiImage } from "react-icons/fi"
 import type { PostAnalytics } from "../../graphql/insight.types"
 import Image from "next/image";
-
-
 
 interface InsightCardProps {
     post: PostAnalytics;
@@ -16,21 +15,28 @@ const platformColors = {
 }
 
 export function InsightCard({post}: InsightCardProps) {
+    const [imgError, setImgError] = useState(false);
     const sentimentColor = post.avgSentiment > 0 ? 'text-green-600' : post.avgSentiment < 0 ? 'text-red-600' : 'text-gray-500';
     const sentimentLabel = post.avgSentiment > 0.1 ? 'Positive' : post.avgSentiment < -0.1 ? 'Negative' : 'Neutral';
 
     return (
-        <div className="rounded-lg border bg-white shadow-sm overflow-hidden">
+        <div className="rounded-lg border bg-white shadow-sm overflow-hidden transition-shadow hover:shadow-md">
             <div className="aspect-square bg-gray-100 relative">
-                {post.fileUrl ? (
-                    <Image src={post.fileUrl} alt={post.caption}  className="w-full h-full object-cover"/>
-
+                {post.fileUrl && !imgError ? (
+                    <Image
+                        src={post.fileUrl}
+                        alt={post.caption || 'Post thumbnail'}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        className="object-cover"
+                        onError={() => setImgError(true)}
+                    />
                 ) : (
-                    <div className="flex items-center justify-center h-full text-gray-400">
-                        No Image
+                    <div className="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
+                        <FiImage className="w-8 h-8" />
+                        <span className="text-xs">No Image</span>
                     </div>
-                )
-                }
+                )}
                 <span className={`absolute top-2 left-2 px-2 py-0.5 rounded text-xs font-medium text-white ${platformColors[post.platform]}`}>
                     {post.platform === 'INSTAGRAM' ? 'IG' : 'TK' }
                 </span>
