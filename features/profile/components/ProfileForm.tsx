@@ -14,7 +14,13 @@ import { useChangeAvatarMutation } from '../graphql/change-avatar.mutation';
 import { useChangePhoneMutation } from '../graphql/change-phone.mutation';
 import { useChangeSocialAccountMutation } from '../graphql/change-social-account.mutation';
 import type { SocialAccountInput, SocialAccount } from '../graphql/profile.types';
-import { extractErrorMessage } from '@/lib/error-utils';
+
+// Helper bebas any
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === 'string') return error;
+  return 'Terjadi kesalahan';
+}
 
 export function ProfileForm() {
   const router = useRouter();
@@ -23,18 +29,21 @@ export function ProfileForm() {
   const [changePhone, { loading: phoneLoading }] = useChangePhoneMutation();
   const [changeSocial, { loading: socialLoading }] = useChangeSocialAccountMutation();
 
+  // Refs untuk uncontrolled inputs
   const phoneRef = useRef<HTMLInputElement>(null);
   const instagramRef = useRef<HTMLInputElement>(null);
   const tiktokRef = useRef<HTMLInputElement>(null);
   const apiKeyRef = useRef<HTMLInputElement>(null);
 
+  // Hanya avatar preview yang perlu state (karena upload lokal)
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   const profile = data?.UserInfo;
 
-  const socialAccounts: SocialAccount[] = profile?.social_account ?? [];
-  const instagramAccount = socialAccounts.find(s => s.platform === 'instagram');
-  const tiktokAccount = socialAccounts.find(s => s.platform === 'tiktok');
+  // Ambil nilai default dari data (jika belum tersedia, string kosong)
+  const accounts: SocialAccount[] = (profile?.social_account as SocialAccount[]) || [];
+  const instagramAccount = accounts.find(s => s.platform === 'instagram');
+  const tiktokAccount = accounts.find(s => s.platform === 'tiktok');
 
   const defaultPhone = profile?.phone || '';
   const defaultInstagram = instagramAccount?.username || '';
@@ -49,11 +58,7 @@ export function ProfileForm() {
       return;
     }
     const reader = new FileReader();
-    reader.onloadend = () => {
-      if (typeof reader.result === 'string') {
-        setAvatarPreview(reader.result);
-      }
-    };
+    reader.onloadend = () => setAvatarPreview(reader.result as string);
     reader.readAsDataURL(file);
 
     try {
@@ -62,7 +67,7 @@ export function ProfileForm() {
         toast.success('Avatar berhasil diubah');
       }
     } catch (err: unknown) {
-      toast.error(extractErrorMessage(err));
+      toast.error(getErrorMessage(err));
     }
   };
 
@@ -73,18 +78,40 @@ export function ProfileForm() {
     const newTiktok = tiktokRef.current?.value.trim() || '';
     const newApiKey = apiKeyRef.current?.value.trim() || '';
 
+    // 🆕 Validasi: Jika Instagram username diisi, API Key wajib diisi
+    if (newInstagram && !newApiKey) {
+      toast.error('API Key wajib diisi jika Anda menghubungkan akun Instagram.');
+      return;
+    }
+
+    // 🆕 Validasi: Jika API Key diisi tanpa Instagram username
+    if (!newInstagram && newApiKey) {
+      toast.error('Silakan isi username Instagram terlebih dahulu.');
+      return;
+    }
+
     try {
+      // Ubah phone jika berbeda dengan data awal
       if (newPhone !== defaultPhone) {
         await changePhone({ variables: { input: newPhone } });
         toast.success('Nomor telepon diperbarui');
       }
 
+      // Social accounts
       const socialInput: SocialAccountInput[] = [];
       if (newInstagram) {
-        socialInput.push({ platform: 'instagram', username: newInstagram, apiKey: newApiKey || undefined });
+        socialInput.push({
+          platform: 'instagram',
+          username: newInstagram,
+          apiKey: newApiKey, // API Key sudah pasti ada karena validasi di atas
+        });
       }
       if (newTiktok) {
-        socialInput.push({ platform: 'tiktok', username: newTiktok });
+        socialInput.push({
+          platform: 'tiktok',
+          username: newTiktok,
+          // Tidak mengirim apiKey untuk TikTok
+        });
       }
 
       if (socialInput.length > 0) {
@@ -92,7 +119,7 @@ export function ProfileForm() {
         toast.success('Akun media sosial diperbarui');
       }
     } catch (err: unknown) {
-      toast.error(extractErrorMessage(err));
+      toast.error(getErrorMessage(err));
     }
   };
 
@@ -180,9 +207,18 @@ export function ProfileForm() {
         {/* Akun Media Sosial */}
         <div className="rounded-lg border bg-white p-6 shadow-sm">
           <h2 className="mb-4 text-lg font-medium text-gray-900">Akun Media Sosial</h2>
+          
+          <div className="mb-4 p-3 bg-blue-50 rounded-md border border-blue-100">
+            <p className="text-sm text-blue-800">
+              <span className="font-medium">ℹ️ Informasi:</span> Untuk Instagram, Anda <span className="font-bold">wajib</span> mengisi API Key. Untuk TikTok, API Key bersifat opsional.
+            </p>
+          </div>
+
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="instagram" className={labelClass}>Instagram Username</label>
+              <label htmlFor="instagram" className={labelClass}>
+                Instagram Username <span className="text-red-500">*</span>
+              </label>
               <div className="relative mt-1">
                 <span className={iconClass}><FiInstagram className="h-4 w-4" /></span>
                 <input
@@ -196,7 +232,9 @@ export function ProfileForm() {
               </div>
             </div>
             <div>
-              <label htmlFor="apiKey" className={labelClass}>Api Key (Optional)</label>
+              <label htmlFor="apiKey" className={labelClass}>
+                Instagram API Key <span className="text-red-500">*</span>
+              </label>
               <div className="relative mt-1">
                 <span className={iconClass}><FiKey className="h-4 w-4" /></span>
                 <input
@@ -205,9 +243,10 @@ export function ProfileForm() {
                   defaultValue={defaultApiKey}
                   ref={apiKeyRef}
                   className={`${inputClass} pl-10`}
-                  placeholder="Optional"
+                  placeholder="Wajib diisi untuk Instagram"
                 />
               </div>
+              <p className="mt-1 text-xs text-gray-500">Diperlukan untuk menghubungkan akun Instagram</p>
             </div>
             <div>
               <label htmlFor="tiktok" className={labelClass}>TikTok Username</label>
