@@ -96,36 +96,40 @@ export const authOptions: NextAuthOptions = {
           : { input: { username: credentials.username, password: credentials.password } };
 
         // Request ke GraphQL endpoint
-        const res = await fetch(process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query, variables }),
-        });
+        try {
+          const res = await fetch(process.env.NEXT_PUBLIC_GRAPHQL_ENDPOINT!, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, variables }),
+          });
 
-        // Cek HTTP response status
-        if (!res.ok) {
+          // Cek HTTP response status
+          if (!res.ok) {
+            return null;
+          }
+
+          const { data, errors } = await res.json();
+
+          // Cek GraphQL errors
+          if (errors?.length) {
+            return null;
+          }
+
+          // Extract token dari response (firebaseLogin atau login)
+          const loginData = isFirebaseLogin ? data?.firebaseLogin : data?.login;
+
+          if (loginData) {
+            return {
+              id: isFirebaseLogin ? 'firebase-user' : credentials.username,
+              accessToken: loginData.access_token,
+              refreshToken: loginData.refresh_token,
+            };
+          }
+
+          return null;
+        } catch {
           return null;
         }
-
-        const { data, errors } = await res.json();
-
-        // Cek GraphQL errors
-        if (errors?.length) {
-          return null;
-        }
-
-        // Extract token dari response (firebaseLogin atau login)
-        const loginData = isFirebaseLogin ? data?.firebaseLogin : data?.login;
-
-        if (loginData) {
-          return {
-            id: isFirebaseLogin ? 'firebase-user' : credentials.username,
-            accessToken: loginData.access_token,
-            refreshToken: loginData.refresh_token,
-          };
-        }
-
-        return null;
       },
     }),
   ],
