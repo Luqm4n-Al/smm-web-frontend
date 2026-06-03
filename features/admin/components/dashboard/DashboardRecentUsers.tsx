@@ -41,7 +41,7 @@ export default function DashboardRecentUsers({
     );
 
   return (
-    <div className="col-span-2 overflow-hidden rounded-[10px] border border-black-100 bg-white shadow-sm">
+    <div className="col-span-2 overflow-hidden rounded-[10px] border border-black/60 bg-white shadow-sm">
       {/* TOP */}
       <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5">
         <div>

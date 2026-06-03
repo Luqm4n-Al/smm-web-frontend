@@ -62,7 +62,7 @@ export default function DashboardStatCard({
   }, [value]);
 
   return (
-    <div className="rounded-[10px] border border-black-100 bg-white p-5 shadow-sm">
+    <div className="rounded-[10px] border border-black/60 bg-white p-5 shadow-sm">
       <div className="flex items-start justify-between">
         {/* LEFT */}
         <div>

@@ -37,7 +37,7 @@ export default function UserManagementTable({
   onChangeStatus,
 }: Props) {
   return (
-    <div className="overflow-hidden rounded-[10px] border border-black-100 bg-white shadow-sm">
+    <div className="overflow-hidden rounded-[10px] border border-black/60 bg-white shadow-sm">
       {/* HEADER */}
       <div className="grid grid-cols-[2.6fr_2.2fr_1fr_1.3fr_1.7fr_170px] items-center border-b border-gray-100 bg-gray-50 px-7 py-4">
         {/* USER */}

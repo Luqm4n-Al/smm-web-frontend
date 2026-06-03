@@ -47,7 +47,7 @@ export default function UserManagementPagination({
   );
 
   return (
-    <div className="flex flex-col gap-4 rounded-[10px] border border-black-100 bg-white px-6 py-4 shadow-sm lg:flex-row lg:items-center lg:justify-between">
+    <div className="flex flex-col gap-4 rounded-[10px] border border-black/60 bg-white px-6 py-4 shadow-sm lg:flex-row lg:items-center lg:justify-between">
       {/* LEFT */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-5">
 

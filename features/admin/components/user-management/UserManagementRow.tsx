@@ -11,6 +11,12 @@ import {
   XCircle,
 } from 'lucide-react';
 
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+
 interface User {
   id: string;
 
@@ -40,23 +46,9 @@ export default function UserManagementRow({
   user,
   onChangeStatus,
 }: Props) {
-  /**
-   * DROPDOWN
-   */
-  const [openMenu, setOpenMenu] =
-    useState(false);
-
-  /**
-   * LOGIN DETAIL
-   */
-  const [
-    openLoginDetail,
-    setOpenLoginDetail,
-  ] = useState(false);
-
-  /**
-   * LOCAL STATUS
-   */
+ 
+  // LOCAL STATUS
+  
   const [
     localStatus,
     setLocalStatus,
@@ -65,25 +57,27 @@ export default function UserManagementRow({
       user.isActive === 'true'
   );
 
-  /**
-   * LOADING
-   */
+  
+  // LOADING
   const [
     loadingStatus,
     setLoadingStatus,
   ] = useState(false);
 
-  /**
-   * AVATAR
-   */
+  const [
+    openStatusMenu,
+    setOpenStatusMenu,
+  ] = useState(false);
+
+  
+  // AVATAR
   const initials =
     user.username
       ?.slice(0, 2)
       .toUpperCase() || 'US';
 
-  /**
-   * FORMAT DATE
-   */
+  
+  // FORMAT DATE
   const formatDate = (
     dateString: string
   ) => {
@@ -108,10 +102,7 @@ export default function UserManagementRow({
     );
   };
 
-  /**
-   * LAST LOGIN DATE
-   * TANPA CONVERT TIMEZONE
-   */
+  //  LAST LOGIN DATE
   const formatLastLogin = (
     dateString: string
   ) => {
@@ -136,17 +127,10 @@ export default function UserManagementRow({
     );
   };
 
-  /**
-   * LAST LOGIN TIME
-   * TANPA CONVERT TIMEZONE
-   */
+  //  LAST LOGIN TIME
   const formatLastLoginTime = (
     dateString: string
   ) => {
-    /**
-     * CONTOH:
-     * 2026-05-23T12:27:18.525252Z
-     */
 
     const splitDate =
       dateString.split('T');
@@ -155,26 +139,20 @@ export default function UserManagementRow({
       return '-';
     }
 
-    /**
-     * AMBIL JAM SAJA
-     */
     return splitDate[1]
       .replace('Z', '')
       .split('.')[0];
   };
 
-  /**
-   * CHANGE STATUS
-   */
+  // CHANGE STATUS
   const handleStatusChange =
     async (
       status:
         | 'Active'
         | 'Inactive'
     ) => {
-      /**
-       * OPTIMISTIC UPDATE
-       */
+      
+      // OPTIMISTIC UPDATE
       const previousStatus =
         localStatus;
 
@@ -189,12 +167,10 @@ export default function UserManagementRow({
           user.id,
           status
         );
-
-        setOpenMenu(false);
+        setOpenStatusMenu(false);
       } catch (error) {
-        /**
-         * ROLLBACK
-         */
+        
+        // ROLLBACK
         setLocalStatus(
           previousStatus
         );
@@ -242,38 +218,39 @@ export default function UserManagementRow({
       </div>
 
       {/* LAST LOGIN */}
-      <div className="relative">
+      <div>
         {user.lastLoginAt ? (
-          <>
-            <button
-              onClick={() =>
-                setOpenLoginDetail(
-                  !openLoginDetail
-                )
-              }
-              className="group flex items-center gap-2 text-sm text-gray-600 transition"
-            >
-              <span>
-                {formatLastLogin(
-                  user.lastLoginAt
-                )}
-              </span>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="group flex items-center gap-2 text-sm text-gray-600 transition">
+                <span>
+                  {formatLastLogin(
+                    user.lastLoginAt
+                  )}
+                </span>
 
-              <Info
-                size={14}
-                className="text-gray-400 transition group-hover:text-blue-500"
-              />
-            </button>
+                <Info
+                  size={14}
+                  className="text-gray-400 transition group-hover:text-gray-700"
+                />
+              </button>
+            </PopoverTrigger>
 
-            {/* POPUP */}
-            <div
-              className={`absolute left-0 top-9 z-50 w-56 rounded-[12px] border border-gray-200 bg-white p-4 shadow-xl transition-all duration-200 ${
-                openLoginDetail
-                  ? 'visible translate-y-0 opacity-100'
-                  : 'invisible -translate-y-2 opacity-0'
-              }`}
+            <PopoverContent
+              side="top"
+              align="start"
+              sideOffset={8}
+              className="
+                w-56
+                rounded-[10px]
+                border
+                border-black/10
+                bg-white
+                px-2
+                py-2
+                shadow-lg
+              "
             >
-              {/* HEADER */}
               <div className="flex items-center justify-between">
                 <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
                   Login Detail
@@ -284,8 +261,7 @@ export default function UserManagementRow({
                 </div>
               </div>
 
-              {/* TIME */}
-              <div className="mt-4 flex items-center gap-2">
+              <div className="mt-2 flex items-center gap-2">
                 <Clock3
                   size={16}
                   className="text-blue-500"
@@ -298,14 +274,13 @@ export default function UserManagementRow({
                 </p>
               </div>
 
-              {/* DATE */}
-              <p className="mt-2 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-gray-500">
                 {formatLastLogin(
                   user.lastLoginAt
                 )}
               </p>
-            </div>
-          </>
+            </PopoverContent>
+          </Popover>
         ) : (
           <p className="text-sm text-gray-400">
             Never login
@@ -314,91 +289,88 @@ export default function UserManagementRow({
       </div>
 
       {/* STATUS */}
-      <div className="relative flex items-center">
-        <div className="flex items-center gap-2">
-          {/* BADGE */}
-          <div
-            className={`flex min-w-[90px] items-center justify-center rounded-full px-3 py-[7px] text-xs font-semibold transition-all duration-200 ${
-              localStatus
-                ? 'bg-green-100 text-green-700'
-                : 'bg-red-100 text-red-600'
-            }`}
-          >
-            {loadingStatus ? (
-              <Loader2
-                size={14}
-                className="animate-spin"
-              />
-            ) : localStatus ? (
-              'Active'
-            ) : (
-              'Inactive'
-            )}
+      <div className="flex items-center">
+          <div className="flex items-center gap-2">
+            {/* BADGE */}
+            <div
+              className={`flex min-w-[90px] items-center justify-center rounded-full px-3 py-[7px] text-xs font-semibold transition-all duration-200 ${
+                localStatus
+                  ? 'bg-green-100 text-green-700'
+                  : 'bg-red-100 text-red-600'
+              }`}
+            >
+              {loadingStatus ? (
+                <Loader2
+                  size={14}
+                  className="animate-spin"
+                />
+              ) : localStatus ? (
+                'Active'
+              ) : (
+                'Inactive'
+              )}
+            </div>
+
+            {/* STATUS MENU */}
+            <Popover
+              open={openStatusMenu}
+              onOpenChange={setOpenStatusMenu}
+            >
+              
+              <PopoverTrigger asChild>
+                <button
+                  disabled={loadingStatus}
+                  className="rounded-lg p-1 transition hover:bg-gray-100 disabled:opacity-50"
+                >
+                  <MoreVertical
+                    size={16}
+                    className="text-gray-500"
+                  />
+                </button>
+              </PopoverTrigger>
+
+              <PopoverContent
+                side="bottom"
+                align="end"
+                sideOffset={8}
+                className="w-40 rounded-[10px] border border-black/10 p-1 shadow-lg"
+              >
+                {!localStatus && (
+                  <button
+                    onClick={() =>
+                      handleStatusChange(
+                        'Active'
+                      )
+                    }
+                    className="flex w-full items-center gap-2 rounded-[10px] px-3 py-2.5 text-sm hover:bg-green-50"
+                  >
+                    <CheckCircle2
+                      size={16}
+                      className="text-green-600"
+                    />
+                    Active
+                  </button>
+                )}
+
+                {localStatus && (
+                  <button
+                    onClick={() =>
+                      handleStatusChange(
+                        'Inactive'
+                      )
+                    }
+                    className="flex w-full items-center gap-2 rounded-[10px] px-3 py-2.5 text-sm hover:bg-red-50"
+                  >
+                    <XCircle
+                      size={16}
+                      className="text-red-500"
+                    />
+                    Inactive
+                  </button>
+                )}
+              </PopoverContent>
+            </Popover>
           </div>
-
-          {/* MENU */}
-          <button
-            disabled={
-              loadingStatus
-            }
-            onClick={() =>
-              setOpenMenu(
-                !openMenu
-              )
-            }
-            className="rounded-lg p-1 transition hover:bg-gray-100 disabled:opacity-50"
-          >
-            <MoreVertical
-              size={16}
-              className="text-gray-500"
-            />
-          </button>
-        </div>
-
-        {/* DROPDOWN */}
-        <div
-          className={`absolute right-0 top-11 z-[100] w-40 rounded-[12px] border border-gray-200 bg-white p-1 shadow-2xl transition-all duration-200 ${
-            openMenu
-              ? 'visible translate-y-0 opacity-100'
-              : 'invisible -translate-y-2 opacity-0'
-          }`}
-        >
-          {!localStatus && (
-            <button
-              onClick={() =>
-                handleStatusChange(
-                  'Active'
-                )
-              }
-              className="flex w-full items-center gap-2 rounded-[10px] px-3 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-green-50"
-            >
-              <CheckCircle2
-                size={16}
-                className="text-green-600"
-              />
-
-              Active
-            </button>
-          )}
-
-          {localStatus && (
-            <button
-              onClick={() =>
-                handleStatusChange(
-                  'Inactive'
-                )
-              }
-              className="flex w-full items-center gap-2 rounded-[10px] px-3 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-red-50"
-            >
-              <XCircle
-                size={16}
-                className="text-red-500"
-              />
-
-              Inactive
-            </button>
-          )}
-        </div>
       </div>
     </div>
   );

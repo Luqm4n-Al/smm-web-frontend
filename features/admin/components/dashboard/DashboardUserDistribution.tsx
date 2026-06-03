@@ -78,7 +78,7 @@ export default function DashboardUserDistribution({
   }, [activePercentage]);
 
   return (
-    <div className="rounded-[10px] border border-black-100 bg-white p-5 shadow-sm">
+    <div className="rounded-[10px] border border-black/60 bg-white p-5 shadow-sm">
       {/* HEADER */}
       <div className="flex items-center justify-between">
         <div>

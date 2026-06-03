@@ -67,21 +67,15 @@ export default function UserManagementFilters(
     setPage,
   } = props;
 
-  /**
-   * FILTER POPUP
-   */
+  // FILTER POPUP
   const [open, setOpen] =
     useState(false);
 
-  /**
-   * APPLIED LOGIN RANGE
-   */
+  // APPLIED LOGIN RANGE
   const [loginRange, setLoginRange] =
     useState('Last 30 Days');
 
-  /**
-   * TEMP FILTER
-   */
+  // TEMP FILTER
   const [tempStatus, setTempStatus] =
     useState(status);
 
@@ -90,31 +84,24 @@ export default function UserManagementFilters(
     setTempLoginRange,
   ] = useState(loginRange);
 
-  /**
-   * DROPDOWN
-   */
+  // DROPDOWN
   const [
     openFrequency,
     setOpenFrequency,
   ] = useState(false);
 
-  /**
-   * SYNC DRAFT
-   */
+  // SYNC DRAFT
   useEffect(() => {
     setTempStatus(status);
   }, [status]);
 
-  /**
-   * TOGGLE FILTER
-   */
+  // TOGGLE FILTER
+  
   const toggleOpen = () => {
     setOpen((prev) => !prev);
   };
 
-  /**
-   * APPLY FILTER
-   */
+  // APPLY FILTER
   const handleApplyFilter =
     () => {
       setStatus(tempStatus);
@@ -185,9 +172,7 @@ export default function UserManagementFilters(
       setOpen(false);
     };
 
-  /**
-   * RESET
-   */
+  // RESET
   const handleReset =
     () => {
       setSearch('');
@@ -209,6 +194,10 @@ export default function UserManagementFilters(
       onChangeEndDate('');
 
       setPage(1);
+
+      setOpenFrequency(false);
+
+      setOpen(false);
     };
 
   return (
@@ -236,7 +225,7 @@ export default function UserManagementFilters(
             w-full
             rounded-[10px]
             border
-            border-black-100
+            border-black/60
             bg-white
             pl-10
             pr-4
@@ -260,7 +249,7 @@ export default function UserManagementFilters(
             gap-2
             rounded-[10px]
             border
-            border-black-100
+            border-black/60
             bg-white
             px-4
             text-sm
@@ -281,13 +270,13 @@ export default function UserManagementFilters(
               right-0
               top-12
               z-50
-              w-[340px]
-              rounded-2xl
+              w-[280px]
+              rounded-[10px]
               border
-              border-gray-200
+              border-black/10
               bg-white
-              p-6
-              shadow-2xl
+              p-4
+              shadow-lg
             "
           >
             {/* HEADER */}
