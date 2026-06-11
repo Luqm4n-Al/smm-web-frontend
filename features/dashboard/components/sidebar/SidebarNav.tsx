@@ -54,10 +54,13 @@ export function SidebarNav() {
            * Aktif jika:
            * - URL sama persis
            * - atau merupakan child route (misal: /dashboard/analytics)
+           * 
+           * Khusus untuk Dashboard (/dashboard), hanya aktif saat path-nya exactly /dashboard
+           * (tidak termasuk child route seperti /dashboard/analytics)
            */
           const isActive =
             pathname === item.href ||
-            pathname.startsWith(item.href + '/');
+            (pathname.startsWith(item.href + '/') && item.href !== '/dashboard');
 
           // Ambil icon component dari item
           const IconComponent = item.icon;

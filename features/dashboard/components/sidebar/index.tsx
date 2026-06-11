@@ -1,7 +1,6 @@
 'use client'
 
 import { SidebarNav } from "./SidebarNav"
-import { SidebarFooter } from "./SidebarFooter"
 import { Logo } from "@/shared/Logo"
 
 
@@ -13,7 +12,6 @@ export function Sidebar() {
                 <Logo variant="full" size={50} href="/dashboard" priority/>
             </div>
             <SidebarNav/>
-            <SidebarFooter/>
         </aside>
     )
 }

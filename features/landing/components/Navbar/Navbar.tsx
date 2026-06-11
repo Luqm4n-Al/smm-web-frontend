@@ -72,10 +72,6 @@ export function Navbar() {
               onItemClick={handleScrollToFeature}
             />
           </div>
-
-          <Link href="/about" className="text-gray-700 hover:text-blue-600">
-            About
-          </Link>
         </div>
 
         {/* Tombol Kanan */}
