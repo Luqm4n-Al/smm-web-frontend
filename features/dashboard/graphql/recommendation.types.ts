@@ -56,3 +56,22 @@ export interface BestTimeToPost {
     time: string;
     generated_at: string;
 }
+
+/**
+ * TrendingPost
+ *
+ * Representasi data trending post
+ * dari platform tertentu (Instagram/TikTok).
+ *
+ * Fields:
+ * - rank           → peringkat trending post (1-N)
+ * - trending_score → skor trending/popularitas (0-100)
+ * - caption        → caption/deskripsi dari post
+ * - url            → URL menuju post di platform
+ */
+export interface TrendingPost {
+    rank: number;
+    trending_score: number;
+    caption: string;
+    url: string;
+}

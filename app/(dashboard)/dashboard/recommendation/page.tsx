@@ -2,6 +2,7 @@
 import { AIRecommendationCard } from "@/features/dashboard/components/recommendation/AIRecommendationCard";
 import { BestTimeWidget } from "@/features/dashboard/components/recommendation/BestTimeWidget";
 import { HashtagCloud } from "@/features/dashboard/components/recommendation/HashtagCloud";
+import { TrendingPostCard } from "@/features/dashboard/components/recommendation/TrendingPostCard";
 import { TopContentRanking } from "@/features/dashboard/components/recommendation/TopContentRangking";
 import { SearchableSection } from "@/features/dashboard/components/SearchableSection";
 import { NoSearchResults } from "@/features/dashboard/components/NoSearchResults";
@@ -30,6 +31,9 @@ export default function RecommendationPage() {
                 <div className="space-y-6 lg:col-span-2">
                     <SearchableSection title="Hashtag Recommendation">
                         <HashtagCloud />
+                    </SearchableSection>
+                    <SearchableSection title="Trending Posts">
+                        <TrendingPostCard />
                     </SearchableSection>
                     <SearchableSection title="Smart Recommendations">
                         <AIRecommendationCard />
